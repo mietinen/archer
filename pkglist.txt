@@ -1,0 +1,19 @@
+# List of packages to be installed
+# Can be generated with: pacman -Qqe > pkglist.txt
+
+# Basic stuff
+base-devel
+sudo
+openssh
+dhcpcd
+lm_sensors
+
+# Terminal apps
+neovim
+nano
+shellcheck
+tmux
+htop
+xclip
+expac
+neofetch

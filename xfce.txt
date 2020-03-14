@@ -1,0 +1,62 @@
+# Basic stuff
+base-devel
+sudo
+intel-ucode
+openssh
+xorg
+xdg-user-dirs
+pulseaudio
+
+# Network
+networkmanager
+network-manager-applet
+strongswan
+wavemon
+nmap
+
+# Xfce4 desktop
+xfce4
+lightdm
+lightdm-gtk-greeter
+gtk-engine-murrine
+arc-gtk-theme
+papirus-icon-theme
+qt5ct
+mousepad
+thunar-archive-plugin
+thunar-media-tags-plugin
+xfce4-clipman-plugin
+xfce4-datetime-plugin
+xfce4-notifyd
+xfce4-pulseaudio-plugin
+xfce4-screensaver
+xfce4-screenshooter
+xfce4-taskmanager
+xfce4-whiskermenu-plugin
+
+# Utility
+smbclient
+gvfs-smb
+lm_sensors
+libva-utils
+miniupnpc
+xf86-input-wacom
+
+# Terminal/desktop apps
+neovim
+nano
+shellcheck
+tmux
+htop
+xclip
+expac
+neofetch
+viewnior
+celluloid
+conky
+chromium
+syncthing
+discord
+networkmanager-l2tp
+spotify
+matcha-gtk-theme
