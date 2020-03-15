@@ -51,21 +51,6 @@ aistart() {
 	timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
 	showresult
 
-	# Downloading pkglist.txt
-	if [ "$pkglist" != "" ] ; then
-		printm 'Downloading pkglist.txt'
-		wget "$pkglist" -O pkglist.txt >/dev/null 2>>error.txt || error=true
-		showresult
-	fi
-
-	# Reading packages from pkglist.txt
-	if [ -f pkglist.txt ] ; then
-		printm 'Reading packages from pkglist.txt'
-		packages=$(comm -12 <(pacman -Sylq | sort) <(sort pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
-		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
-		showresult
-	fi
-
 	# Setting up partitions
 	printm 'Setting up partitions'
 	if [ "$useefi" = true ] ; then
@@ -116,6 +101,17 @@ aistart() {
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
 
+	# Downloading pkglist.txt
+	if [ "$pkglist" != "" ] ; then
+		printm 'Downloading pkglist.txt'
+		wget "$pkglist" -O /mnt/root/pkglist.txt >/dev/null 2>>error.txt || error=true
+		showresult
+	elif [ -f pkglist.txt ] ; then
+		printm 'Copying pkglist.txt'
+		cp pkglist.txt /mnt/root/pkglist.txt >/dev/null 2>>error.txt || error=true
+		showresult
+	fi
+
 	# Running arch-chroot
 	printm 'Running arch-chroot' ; printf '\n'
 	arch-chroot /mnt /root/archer.sh --chroot
@@ -164,6 +160,14 @@ aichroot() {
 	fi
 	grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>>error.txt || error=true
 	showresult
+
+	# Reading packages from pkglist.txt
+	if [ -f pkglist.txt ] ; then
+		printm 'Reading packages from pkglist.txt'
+		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
+		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
+		showresult
+	fi
 
 	# Installing extra packages
 	if [[ $packages != "" ]] ; then
