@@ -93,6 +93,12 @@ aistart() {
 	if [ "$swapdev" != "" ] ; then swapon $swapdev >/dev/null 2>>error.txt || error=true ; fi
 	showresult
 
+	# Installing and running reflector to generate mirrorlist
+	printm 'Installing and running reflector to generate mirrorlist'
+	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
+	reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
+	showresult
+
 	# Installing base to disk
 	printm 'Installing base to disk'
 	pacstrap /mnt base linux linux-firmware >/dev/null 2>>error.txt || error=true
