@@ -17,3 +17,4 @@ htop
 xclip
 expac
 neofetch
+reflector

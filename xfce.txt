@@ -51,6 +51,7 @@ htop
 xclip
 expac
 neofetch
+reflector
 viewnior
 celluloid
 conky
