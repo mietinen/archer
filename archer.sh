@@ -61,7 +61,7 @@ aistart() {
 	# Reading packages from pkglist.txt
 	if [ -f pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		packages=$(comm -12 <(pacman -Slq | sort) <(sort pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
+		packages=$(comm -12 <(pacman -Sylq | sort) <(sort pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
 		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
 		showresult
 	fi
@@ -79,7 +79,7 @@ aistart() {
 		fi
 	else
 		parted -s $device mklabel msdos >/dev/null 2>>error.txt || error=true
-		echo -e "n\np\n\n\n+512M\na\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
+		echo -e "n\np\n\n\n+400M\na\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
 		if [ "$swapdev" != "" ] ; then
 			echo -e "n\np\n\n\n-${swapsize}\n\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
 			echo -e "n\np\n\n\nt\n\n82\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
@@ -186,6 +186,7 @@ aichroot() {
 
 	# Adding user and setting password
 	printm 'Adding user and setting password'
+	mkdir -p /etc/sudoers.d/
 	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
 	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd

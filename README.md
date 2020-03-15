@@ -27,4 +27,4 @@ pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 # Dotfiles git repo (blank for none)
 dotfilesrepo=""
 ```
-Run script `sh archer.sh`
+Run script `bash archer.sh`
