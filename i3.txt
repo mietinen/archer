@@ -1,0 +1,61 @@
+# Basic stuff
+base-devel
+sudo
+intel-ucode
+openssh
+xorg
+xdg-user-dirs
+pulseaudio
+
+# Network
+networkmanager
+network-manager-applet
+networkmanager-l2tp #AUR
+strongswan
+wavemon
+nmap
+
+# i3-gaps desktop
+i3
+dmenu
+rxvt-unicode
+xcompmgr
+xwallpaper
+perl-anyevent-i3
+perl-json-xs
+lightdm
+lightdm-gtk-greeter
+gtk-engine-murrine
+arc-gtk-theme
+papirus-icon-theme
+matcha-gtk-theme #AUR
+qt5ct
+
+# Utility
+smbclient
+gvfs-smb
+lm_sensors
+libva-utils
+miniupnpc
+xf86-input-wacom
+
+# apps
+neovim
+nano
+nnn
+shellcheck
+tmux
+htop
+xclip
+expac
+neofetch
+reflector
+pcmanfm-gtk3
+xarchiver
+viewnior
+celluloid
+conky
+chromium
+syncthing
+discord
+spotify #AUR
