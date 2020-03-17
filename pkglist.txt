@@ -1,4 +1,5 @@
 # List of packages to be installed
+# Needs 'installyay=true' for AUR packages
 # Can be generated with: pacman -Qqe > pkglist.txt
 
 # Basic stuff
@@ -11,6 +12,7 @@ lm_sensors
 # Terminal apps
 neovim
 nano
+nnn
 shellcheck
 tmux
 htop

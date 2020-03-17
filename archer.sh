@@ -170,8 +170,8 @@ aichroot() {
 	# Reading packages from pkglist.txt
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
-		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -v '^\s*$\|^#\|^\s*\#') | tr '\n' ' ') || error=true
+		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*') | tr '\n' ' ') || error=true
+		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*') | tr '\n' ' ') || error=true
 		showresult
 	fi
 

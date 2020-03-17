@@ -10,6 +10,7 @@ pulseaudio
 # Network
 networkmanager
 network-manager-applet
+networkmanager-l2tp #AUR
 strongswan
 wavemon
 nmap
@@ -21,10 +22,9 @@ lightdm-gtk-greeter
 gtk-engine-murrine
 arc-gtk-theme
 papirus-icon-theme
+matcha-gtk-theme #AUR
 qt5ct
 mousepad
-thunar-archive-plugin
-thunar-media-tags-plugin
 xfce4-clipman-plugin
 xfce4-datetime-plugin
 xfce4-notifyd
@@ -42,9 +42,10 @@ libva-utils
 miniupnpc
 xf86-input-wacom
 
-# Terminal/desktop apps
+# apps
 neovim
 nano
+nnn
 shellcheck
 tmux
 htop
@@ -52,12 +53,12 @@ xclip
 expac
 neofetch
 reflector
+pcmanfm-gtk3
+xarchiver
 viewnior
 celluloid
 conky
 chromium
 syncthing
 discord
-networkmanager-l2tp
-spotify
-matcha-gtk-theme
+spotify #AUR
