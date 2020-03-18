@@ -9,21 +9,19 @@ pulseaudio
 
 # Network
 networkmanager
-networkmanager-dmenu-git #AUR
+network-manager-applet
 networkmanager-l2tp #AUR
 strongswan
 wavemon
 nmap
 
 # i3-gaps desktop
-i3
+awesome
 dmenu
 rxvt-unicode
 xcompmgr
 nitrogen
 arandr
-perl-anyevent-i3
-perl-json-xs
 lightdm
 lightdm-gtk-greeter
 gtk-engine-murrine
