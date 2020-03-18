@@ -20,6 +20,8 @@ i3
 dmenu
 rxvt-unicode
 xcompmgr
+libnotify
+dunst
 nitrogen
 arandr
 perl-anyevent-i3

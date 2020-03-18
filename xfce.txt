@@ -17,6 +17,10 @@ nmap
 
 # Xfce4 desktop
 xfce4
+-xfce4-appfinder
+-xfce4-terminal
+-thunar
+-blablabla
 lightdm
 lightdm-gtk-greeter
 gtk-engine-murrine
@@ -25,6 +29,9 @@ papirus-icon-theme
 matcha-gtk-theme #AUR
 qt5ct
 mousepad
+rxvt-unicode
+thunar-archive-plugin
+thunar-media-tags-plugin
 xfce4-clipman-plugin
 xfce4-datetime-plugin
 xfce4-notifyd
@@ -53,8 +60,6 @@ xclip
 expac
 neofetch
 reflector
-pcmanfm-gtk3
-xarchiver
 viewnior
 celluloid
 conky

@@ -170,8 +170,9 @@ aichroot() {
 	# Reading packages from pkglist.txt
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*') | tr '\n' ' ') || error=true
-		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*') | tr '\n' ' ') || error=true
+		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-') | tr '\n' ' ') || error=true
+		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-') | tr '\n' ' ') || error=true
+		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ') || error=true
 		showresult
 	fi
 
@@ -220,6 +221,13 @@ aichroot() {
 		fi
 	fi
 
+	# Removing unwanted packages
+	if [[ $rempackages != "" ]] ; then
+		printm 'Removing unwanted packages'
+		pacman --noconfirm  -Rsu $(pacman -Qq $rempackages) >/dev/null 2>>error.txt || error=true
+		showresult
+	fi
+	
 	# Installing dotfiles from git repo
 	if [[ $dotfilesrepo != "" ]] ; then
 		printm 'Installing dotfiles from git repo'
