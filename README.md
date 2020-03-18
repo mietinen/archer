@@ -30,8 +30,8 @@ dotfilesrepo=""
 Run script `bash archer.sh`
 
 ## pktlist.txt
-You can make you're own pkglist.txt using `pacman -Qqe > pkglist.txt`
-The script first installs what it finds in official repositories, then tries what's rest from the AUR repositories. Installing AUR packages depends on `yayinstall=true`
+You can make you're own pkglist.txt using `pacman -Qqe > pkglist.txt`  
+The script first installs what it finds in official repositories, then tries what's rest from the AUR repositories. Installing AUR packages depends on `yayinstall=true`  
 Lines starting with an - is removed at the end, if there are no dependencies. Making it posible to install package groups and removing what you dont want. `-xfce4-appfinder`
 
 ## Dotfiles
