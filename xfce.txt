@@ -17,10 +17,7 @@ nmap
 
 # Xfce4 desktop
 xfce4
--xfce4-appfinder
 -xfce4-terminal
--thunar
--blablabla
 lightdm
 lightdm-gtk-greeter
 gtk-engine-murrine
@@ -31,7 +28,6 @@ qt5ct
 mousepad
 rxvt-unicode
 thunar-archive-plugin
-thunar-media-tags-plugin
 xfce4-clipman-plugin
 xfce4-datetime-plugin
 xfce4-notifyd

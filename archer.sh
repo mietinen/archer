@@ -122,6 +122,7 @@ aistart() {
 	printm 'Running arch-chroot' ; printf '\n'
 	arch-chroot /mnt /root/archer.sh --chroot
 	rm /mnt/root/archer.sh
+	[ -f /mnt/root/pkglist.txt ] && rm /mnt/root/pkglist.txt
 }
 
 # Run after arch-chroot

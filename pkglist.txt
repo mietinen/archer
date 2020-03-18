@@ -1,7 +1,7 @@
 # List of packages to be installed
 # Needs 'installyay=true' for AUR packages
 # Can be generated with: pacman -Qqe > pkglist.txt
-# Add - before unwanted packages from groups (-thunar-volman)
+# Add - before unwanted packages from groups (-xfce-terminal)
 
 # Basic stuff
 base-devel
