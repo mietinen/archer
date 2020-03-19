@@ -14,16 +14,18 @@ networkmanager-l2tp #AUR
 strongswan
 wavemon
 nmap
+blueman
 
 # i3-gaps desktop
 i3
 dmenu
-rxvt-unicode
 xcompmgr
 libnotify
 dunst
 nitrogen
 arandr
+pcmanfm-gtk3
+xarchiver
 perl-anyevent-i3
 perl-json-xs
 lightdm
@@ -52,11 +54,13 @@ htop
 xclip
 expac
 neofetch
+rxvt-unicode
 reflector
-pcmanfm-gtk3
-xarchiver
 viewnior
 celluloid
+mupdf
+pandoc
+texlive-core
 conky
 chromium
 syncthing

@@ -14,6 +14,7 @@ networkmanager-l2tp #AUR
 strongswan
 wavemon
 nmap
+blueman
 
 # Xfce4 desktop
 xfce4
@@ -26,7 +27,6 @@ papirus-icon-theme
 matcha-gtk-theme #AUR
 qt5ct
 mousepad
-rxvt-unicode
 thunar-archive-plugin
 xfce4-clipman-plugin
 xfce4-datetime-plugin
@@ -55,9 +55,13 @@ htop
 xclip
 expac
 neofetch
+rxvt-unicode
 reflector
 viewnior
 celluloid
+mupdf
+pandoc
+texlive-core
 conky
 chromium
 syncthing
