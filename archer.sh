@@ -11,7 +11,8 @@ hostname="archie"		# Machine hostname
 username="harry"		# Main user
 device="/dev/sda"		# Drive for install (something like /dev/nvme0n1 or /dev/sda)
 useefi=false			# Use EFI boot (true/false)
-locale="en_GB"			# Locale, en_GB for english with sane time and date format
+language="en_US"		# Language for locale.conf
+locale="nb_NO"			# Locale for locale.conf (safe to use same as language)
 keymap="no"			# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"		# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="3G"			# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
@@ -130,11 +131,23 @@ aichroot() {
 	# Setting up locale and keyboard
 	printm 'Setting up locale and keyboard'
 	sed -i '/#'${locale}'.UTF-8/s/^#//g' /etc/locale.gen
+	sed -i '/#'${language}'.UTF-8/s/^#//g' /etc/locale.gen
 	sed -i '/#en_US.UTF-8/s/^#//g' /etc/locale.gen # For safety reasons
 	locale-gen >/dev/null 2>>error.txt || error=true
 	printf "KEYMAP=%s\n" "${keymap}" > /etc/vconsole.conf
-	printf "LANG=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LANG=%s.UTF-8\n" "${language}" > /etc/locale.conf
 	printf "LC_COLLATE=C\n" >> /etc/locale.conf
+	printf "LC_ADDRESS=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_CTYPE=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_IDENTIFICATION=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_MEASUREMENT=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_MESSAGES=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_MONETARY=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_NAME=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_NUMERIC=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_PAPER=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_TELEPHONE=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_TIME=%s.UTF-8\n" "${locale}" > /etc/locale.conf
 	showresult
 
 	# Setting timezone and adjtime
