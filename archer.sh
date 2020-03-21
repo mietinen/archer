@@ -47,7 +47,7 @@ aistart() {
 	fi
 
 	# Setting up keyboard and clock
-	printm 'Setting up locale and keyboard'
+	printm 'Setting up keyboard and clock'
 	loadkeys ${keymap} >/dev/null 2>>error.txt || error=true
 	timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
 	showresult
