@@ -42,8 +42,15 @@ smbclient
 gvfs-smb
 lm_sensors
 libva-utils
+texlive-core
+mlocate
+xclip
+expac
 miniupnpc
-xf86-input-wacom
+adobe-source-code-pro-fonts
+ttf-inconsolata
+ttf-linux-libertine
+noto-fonts-emoji
 
 # apps
 neovim
@@ -52,16 +59,14 @@ nnn
 shellcheck
 tmux
 htop
-xclip
-expac
 neofetch
 rxvt-unicode
+calc
 reflector
 viewnior
 celluloid
 mupdf
 pandoc
-texlive-core
 conky
 chromium
 syncthing
