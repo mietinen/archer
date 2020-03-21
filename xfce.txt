@@ -62,7 +62,6 @@ htop
 neofetch
 rxvt-unicode
 calc
-dmenu
 reflector
 viewnior
 celluloid
