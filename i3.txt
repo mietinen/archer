@@ -18,7 +18,6 @@ blueman
 
 # i3-gaps desktop
 i3
-dmenu
 xcompmgr
 libnotify
 dunst
@@ -61,6 +60,7 @@ htop
 neofetch
 rxvt-unicode
 calc
+dmenu
 reflector
 viewnior
 celluloid
