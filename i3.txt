@@ -9,6 +9,7 @@ pulseaudio
 
 # Network
 networkmanager
+nm-connection-editor
 networkmanager-dmenu-git #AUR
 networkmanager-l2tp #AUR
 strongswan
