@@ -46,6 +46,7 @@ mlocate
 xclip
 expac
 miniupnpc
+xmlstarlet
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
