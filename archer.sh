@@ -7,17 +7,17 @@
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
 # Some settings
-hostname="archie"		# Machine hostname
-username="harry"		# Main user
-device="/dev/sda"		# Drive for install (something like /dev/nvme0n1 or /dev/sda)
-useefi=false			# Use EFI boot (true/false)
-language="en_US"		# Language for locale.conf
-locale="nb_NO"			# Locale for locale.conf (safe to use same as language)
-keymap="no"			# Keymap (localectl list-keymaps)
-timezone="Europe/Oslo"		# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="3G"			# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
-installyay=true			# Install yay AUR helper (true/false)
-				# Also installs: base-devel git go sudo
+hostname="archie"	# Machine hostname
+username="harry"	# Main user
+device="/dev/sda"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
+useefi=false		# Use EFI boot (true/false)
+language="en_US"	# Language for locale.conf
+locale="nb_NO"		# Time, numbers, messurement, etc. for locale.conf (safe to use same as language)
+keymap="no"		# Keymap (localectl list-keymaps)
+timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
+swapsize="3G"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
+installyay=true		# Install yay AUR helper (true/false)
+			# Also installs: base-devel git go sudo
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from pwd)
 pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
@@ -137,17 +137,17 @@ aichroot() {
 	printf "KEYMAP=%s\n" "${keymap}" > /etc/vconsole.conf
 	printf "LANG=%s.UTF-8\n" "${language}" > /etc/locale.conf
 	printf "LC_COLLATE=C\n" >> /etc/locale.conf
-	printf "LC_ADDRESS=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_CTYPE=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_IDENTIFICATION=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_MEASUREMENT=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_MESSAGES=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_MONETARY=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_NAME=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_NUMERIC=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_PAPER=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_TELEPHONE=%s.UTF-8\n" "${locale}" > /etc/locale.conf
-	printf "LC_TIME=%s.UTF-8\n" "${locale}" > /etc/locale.conf
+	printf "LC_ADDRESS=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_CTYPE=%s.UTF-8\n" "${language}" >> /etc/locale.conf
+	printf "LC_IDENTIFICATION=%s.UTF-8\n" "${language}" >> /etc/locale.conf
+	printf "LC_MEASUREMENT=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_MESSAGES=%s.UTF-8\n" "${language}" >> /etc/locale.conf
+	printf "LC_MONETARY=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_NAME=%s.UTF-8\n" "${language}" >> /etc/locale.conf
+	printf "LC_NUMERIC=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_PAPER=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_TELEPHONE=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
+	printf "LC_TIME=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
 	showresult
 
 	# Setting timezone and adjtime
