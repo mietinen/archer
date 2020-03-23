@@ -203,7 +203,7 @@ aichroot() {
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
 	# Fetch
-	printf "\n# Run fetch if installed\nif command -v pfetch >/dev/null ; then pfetch\nelif command -v neofetch >/dev/null ; then neofetch\nelif command -v screenfetch >/dev/null ; then screenfetch\nfi" >> /etc/bash.bashrc
+	printf "\n# # Run fetch if installed\n# if command -v pfetch >/dev/null ; then pfetch\n# elif command -v neofetch >/dev/null ; then neofetch\n# elif command -v screenfetch >/dev/null ; then screenfetch\n# fi" >> /etc/bash.bashrc
 	# xorg.conf keyboard settings
 	mkdir -p /etc/X11/xorg.conf.d/
 	printf 'Section "InputClass"\n\tIdentifier "system-keyboard"\n\tMatchIsKeyboard "on"\n\tOption "XkbLayout" "%s"\nEndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
