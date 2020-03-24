@@ -38,8 +38,15 @@ matcha-gtk-theme #AUR
 qt5ct
 
 # Utility
+sof-firmware
+alsa-utils
+pulseaudio-alsa
+xf86-video-intel
+dmidecode
+fwupd
 smbclient
 gvfs-smb
+unzip
 lm_sensors
 libva-utils
 texlive-core
@@ -47,7 +54,8 @@ mlocate
 xclip
 expac
 miniupnpc
-xmlstarlet
+xss-lock
+xgetres #AUR
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
