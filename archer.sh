@@ -7,7 +7,7 @@
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
 # Some settings
-hostname="carbon"	# Machine hostname
+hostname="archer"	# Machine hostname
 username="harry"	# Main user
 device="/dev/nvme0n1"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
 useefi=true		# Use EFI boot (true/false)
@@ -80,7 +80,7 @@ aistart() {
 	if [ "$useefi" = true ] ; then
 		mkfs.vfat $bootdev >/dev/null 2>>error.txt || error=true
 	else
-		mkfs.ext4 $bootdev >/dev/nullmou 2>>error.txt || error=true
+		mkfs.ext4 $bootdev >/dev/null 2>>error.txt || error=true
 	fi
 	if [ "$swapdev" != "" ] ; then mkswap -f $swapdev >/dev/null 2>>error.txt || error=true ; fi
 	mkfs.ext4 $rootdev >/dev/null 2>>error.txt || error=true
@@ -124,6 +124,7 @@ aistart() {
 	arch-chroot /mnt /root/archer.sh --chroot
 	rm /mnt/root/archer.sh
 	[ -f /mnt/root/pkglist.txt ] && rm /mnt/root/pkglist.txt
+	[ -f /mnt/error.txt ] && cat /mnt/error.txt >>error.txt && rm /mnt/error.txt
 }
 
 # Run after arch-chroot
@@ -281,6 +282,9 @@ aichroot() {
 	elif pacman -Qs entrance >/dev/null 2>&1 ; then
 		systemctl enable entrance.service >/dev/null 2>>error.txt || error=true
 	fi
+	# Services: other
+	pacman -Q bluez >/dev/null 2>&1 && \
+		systemctl enable bluetooth.service >/dev/null 2>>error.txt || error=true
 	showresult
 	rm -f /etc/sudoers.d/wheelnopasswd >/dev/null 2>>error.txt
 
@@ -293,7 +297,7 @@ showresult() {
 }
 # Padding
 width=$(($(tput cols)-15))
-padding=$(printf '.%.0s' {1..200})
+padding=$(printf '.%.0s' {1..500})
 printm() {
 	printf '%-'$width'.'$width's' "$1 $padding"
 }
