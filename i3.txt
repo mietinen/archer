@@ -16,6 +16,8 @@ strongswan
 wavemon
 nmap
 blueman
+modemmanager
+xmm7360-usb-modeswitch-git
 
 # i3-gaps desktop
 i3
@@ -25,10 +27,9 @@ libnotify
 dunst
 nitrogen
 arandr
+xss-lock
 pcmanfm-gtk3
 xarchiver
-perl-anyevent-i3
-perl-json-xs
 lightdm
 lightdm-gtk-greeter
 gtk-engine-murrine
@@ -38,6 +39,7 @@ matcha-gtk-theme #AUR
 qt5ct
 
 # Utility
+usbutils
 sof-firmware
 alsa-utils
 pulseaudio-alsa
@@ -54,8 +56,7 @@ mlocate
 xclip
 expac
 miniupnpc
-xss-lock
-xgetres #AUR
+xorg-appres
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
@@ -70,6 +71,8 @@ tmux
 htop
 neofetch
 rxvt-unicode
+urxvt-perls
+urxvt-resize-font-git #AUR
 calc
 reflector
 viewnior

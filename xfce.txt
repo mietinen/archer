@@ -15,6 +15,8 @@ strongswan
 wavemon
 nmap
 blueman
+modemmanager
+xmm7360-usb-modeswitch-git
 
 # Xfce4 desktop
 xfce4
@@ -38,8 +40,16 @@ xfce4-taskmanager
 xfce4-whiskermenu-plugin
 
 # Utility
+usbutils
+sof-firmware
+alsa-utils
+pulseaudio-alsa
+xf86-video-intel
+dmidecode
+fwupd
 smbclient
 gvfs-smb
+unzip
 lm_sensors
 libva-utils
 texlive-core
@@ -47,7 +57,7 @@ mlocate
 xclip
 expac
 miniupnpc
-xmlstarlet
+xorg-appres
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
@@ -62,6 +72,8 @@ tmux
 htop
 neofetch
 rxvt-unicode
+urxvt-perls
+urxvt-resize-font-git #AUR
 calc
 reflector
 viewnior
