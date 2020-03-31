@@ -12,15 +12,15 @@ Edit archer.sh `vim archer.sh`
 
 ```
 # Some settings
-hostname="archie"	# Machine hostname
-username="harry"	# Main user
-device="/dev/sda"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
-useefi=false		# Use EFI boot (true/false)
+hostname="archer"	# Machine hostname
+username="mietinen"	# Main user
+device="/dev/nvme0n1"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
+useefi=true		# Use EFI boot (true/false)
 language="en_GB"	# Language for locale.conf (en_GB for english with sane time format)
 locale="nb_NO"		# Numbers, messurement, etc. for locale.conf (safe to use same as language)
 keymap="no"		# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="3G"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
+swapsize="auto"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
 installyay=true		# Install yay AUR helper (true/false)
 			# Also installs: base-devel git go sudo
 
