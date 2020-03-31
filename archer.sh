@@ -8,7 +8,7 @@
 
 # Some settings
 hostname="archer"	# Machine hostname
-username="harry"	# Main user
+username="mietinen"	# Main user
 device="/dev/nvme0n1"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
 useefi=true		# Use EFI boot (true/false)
 language="en_GB"	# Language for locale.conf (en_GB for english with sane time format)
@@ -20,7 +20,7 @@ installyay=true		# Install yay AUR helper (true/false)
 			# Also installs: base-devel git go sudo
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from pwd)
-pkglist="https://gitlab.com/mietinen/archer/-/raw/master/i3.txt"
+pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
 dotfilesrepo="https://gitlab.com/mietinen/dotfiles.git"
@@ -97,7 +97,7 @@ aistart() {
 	# Installing and running reflector to generate mirrorlist
 	printm 'Installing and running reflector to generate mirrorlist'
 	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
-	reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
+	reflector -l 100 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Installing base to disk
