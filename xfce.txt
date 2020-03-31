@@ -50,9 +50,9 @@ fwupd
 smbclient
 gvfs-smb
 unzip
+unrar
 lm_sensors
 libva-utils
-texlive-core
 mlocate
 xclip
 expac
@@ -79,7 +79,6 @@ reflector
 viewnior
 celluloid
 mupdf
-pandoc
 conky
 chromium
 syncthing
