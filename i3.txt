@@ -17,12 +17,12 @@ wavemon
 nmap
 blueman
 modemmanager
-xmm7360-usb-modeswitch-git
+xmm7360-usb-modeswitch-git #AUR
 
 # i3-gaps desktop
 i3
 dmenu
-xcompmgr
+picom
 libnotify
 dunst
 nitrogen
@@ -30,6 +30,7 @@ arandr
 xss-lock
 pcmanfm-gtk3
 xarchiver
+gnome-keyring
 lightdm
 lightdm-gtk-greeter
 gtk-engine-murrine
@@ -44,6 +45,7 @@ sof-firmware
 alsa-utils
 pulseaudio-alsa
 xf86-video-intel
+intel-media-driver
 dmidecode
 fwupd
 smbclient
@@ -55,12 +57,12 @@ libva-utils
 mlocate
 xclip
 expac
-miniupnpc
 xorg-appres
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
 noto-fonts-emoji
+ttf-nerd-fonts-symbols
 
 # apps
 neovim
@@ -78,6 +80,7 @@ reflector
 viewnior
 celluloid
 mupdf
+qalculate-gtk
 conky
 chromium
 syncthing

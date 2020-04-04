@@ -16,7 +16,7 @@ wavemon
 nmap
 blueman
 modemmanager
-xmm7360-usb-modeswitch-git
+xmm7360-usb-modeswitch-git #AUR
 
 # Xfce4 desktop
 xfce4
@@ -45,6 +45,7 @@ sof-firmware
 alsa-utils
 pulseaudio-alsa
 xf86-video-intel
+intel-media-driver
 dmidecode
 fwupd
 smbclient
@@ -56,12 +57,12 @@ libva-utils
 mlocate
 xclip
 expac
-miniupnpc
 xorg-appres
 adobe-source-code-pro-fonts
 ttf-inconsolata
 ttf-linux-libertine
 noto-fonts-emoji
+ttf-nerd-fonts-symbols
 
 # apps
 neovim
@@ -79,6 +80,7 @@ reflector
 viewnior
 celluloid
 mupdf
+qalculate-gtk
 conky
 chromium
 syncthing
