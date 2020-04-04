@@ -256,7 +256,6 @@ aichroot() {
 
 	# Enabeling services
 	printm 'Enabeling services'
-	systemctl enable fstrim.timer 2>>error.txt || error=true
 	# Services: network manager
 	if pacman -Q networkmanager >/dev/null 2>&1 ; then
 		systemctl enable NetworkManager.service >/dev/null 2>>error.txt || error=true
@@ -282,6 +281,8 @@ aichroot() {
 		systemctl enable entrance.service >/dev/null 2>>error.txt || error=true
 	fi
 	# Services: other
+	pacman -Q util-linux >/dev/null 2>&1 && \
+		systemctl enable fstrim.timer 2>>error.txt || error=true
 	pacman -Q bluez >/dev/null 2>&1 && \
 		systemctl enable bluetooth.service >/dev/null 2>>error.txt || error=true
 	showresult
