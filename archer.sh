@@ -202,6 +202,7 @@ aichroot() {
 	printm 'Editing som /etc files'
 	grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf # Pacman colors
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
+	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
 	# Fetch
 	printf "\n# # Run fetch if installed\n# if command -v pfetch >/dev/null ; then pfetch\n# elif command -v neofetch >/dev/null ; then neofetch\n# elif command -v screenfetch >/dev/null ; then screenfetch\n# fi" >> /etc/bash.bashrc
 	# xorg.conf keyboard settings
