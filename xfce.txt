@@ -11,6 +11,7 @@ pulseaudio
 networkmanager
 network-manager-applet
 networkmanager-l2tp #AUR
+networkmanager-openvpn
 strongswan
 wavemon
 nmap
@@ -48,6 +49,7 @@ xf86-video-intel
 intel-media-driver
 dmidecode
 fwupd
+sshfs
 smbclient
 gvfs-smb
 unzip
@@ -68,14 +70,16 @@ ttf-nerd-fonts-symbols
 neovim
 nano
 nnn
+trash-cli
 shellcheck
+irssi
 tmux
 htop
+whois
 neofetch
 rxvt-unicode
 urxvt-perls
 urxvt-resize-font-git #AUR
-calc
 reflector
 viewnior
 celluloid
@@ -86,3 +90,7 @@ chromium
 syncthing
 discord
 spotify #AUR
+plex-media-player #AUR
+ookla-speedtest-bin #AUR
+iperf3
+wireshark-qt
