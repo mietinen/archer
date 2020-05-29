@@ -185,8 +185,10 @@ aichroot() {
 	# Reading packages from pkglist.txt
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		packages=$(comm -12 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-') | tr '\n' ' ') || error=true
-		aurpackages=$(comm -13 <(pacman -Slq | sort) <(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-') | tr '\n' ' ') || error=true
+		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort)"
+		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//')"
+		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
+		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
 		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ') || error=true
 		showresult
 	fi
