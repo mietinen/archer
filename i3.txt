@@ -6,6 +6,7 @@ openssh
 xorg
 xdg-user-dirs
 pulseaudio
+bash-completion
 
 # Network
 networkmanager

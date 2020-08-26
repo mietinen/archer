@@ -9,6 +9,7 @@ sudo
 openssh
 dhcpcd
 lm_sensors
+bash-completion
 
 # Terminal apps
 neovim

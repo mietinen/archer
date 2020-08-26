@@ -30,10 +30,20 @@ dotfilesrepo="https://gitlab.com/mietinen/dotfiles.git"
 #	No edit from here	#
 # # # # # # # # # # # # # # # # #
 
-if [ "${device::8}" == "/dev/nvm" ] ; then bootdev=${device}"p1" ; rootdev=${device}"p2" ; swapdev=${device}"p3"
-else bootdev=${device}"1" ; rootdev=${device}"2" ; swapdev=${device}"3" ; fi
+if [ "${device::8}" == "/dev/nvm" ] ; then
+	bootdev=${device}"p1"
+	rootdev=${device}"p2"
+	swapdev=${device}"p3"
+else
+	bootdev=${device}"1"
+	rootdev=${device}"2"
+	swapdev=${device}"3"
+fi
+
 # Set size of swap partition same as total memory if set as auto
-[ "$swapsize" = "auto" ] && swapsize=$((($(grep MemTotal /proc/meminfo | awk '{ print $2 }')+500000)/1000000))"G"
+[ "$swapsize" = "auto" ] && \
+	swapsize=$((($(grep MemTotal /proc/meminfo | awk '{ print $2 }')+500000)/1000000))"G"
+
 # Disable swap partition if set to 0
 [ "$swapsize" = "0" ] && swapdev=""
 
@@ -82,16 +92,16 @@ aistart() {
 	else
 		mkfs.ext4 $bootdev >/dev/null 2>>error.txt || error=true
 	fi
-	if [ "$swapdev" != "" ] ; then mkswap -f $swapdev >/dev/null 2>>error.txt || error=true ; fi
-	mkfs.ext4 $rootdev >/dev/null 2>>error.txt || error=true
+	[ "$swapdev" != "" ] && mkswap -f "$swapdev" >/dev/null 2>>error.txt || error=true
+	mkfs.ext4 "$rootdev" >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Mounting partitions
 	printm 'Mounting partitions'
-	mount $rootdev /mnt >/dev/null 2>>error.txt || error=true
+	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
 	mkdir -p /mnt/{boot,home} >/dev/null 2>>error.txt || error=true
-	mount $bootdev /mnt/boot >/dev/null 2>>error.txt || error=true
-	if [ "$swapdev" != "" ] ; then swapon $swapdev >/dev/null 2>>error.txt || error=true ; fi
+	mount "$bootdev" /mnt/boot >/dev/null 2>>error.txt || error=true
+	if [ "$swapdev" != "" ] ; then swapon "$swapdev" >/dev/null 2>>error.txt || error=true ; fi
 	showresult
 
 	# Installing and running reflector to generate mirrorlist
@@ -120,7 +130,8 @@ aistart() {
 	fi
 
 	# Running arch-chroot
-	printm 'Running arch-chroot' ; printf '\n'
+	printm 'Running arch-chroot'
+	echo
 	arch-chroot /mnt /root/archer.sh --chroot
 	rm /mnt/root/archer.sh
 	[ -f /mnt/root/pkglist.txt ] && rm /mnt/root/pkglist.txt
@@ -174,7 +185,8 @@ aichroot() {
 	printm 'Installing bootloader'
 	if [ "$useefi" = true ] ; then
 		pacman --noconfirm --needed -Sy grub efibootmgr >/dev/null 2>>error.txt || error=true
-		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck $device >/dev/null 2>>error.txt || error=true
+		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck $device \
+			>/dev/null 2>>error.txt || error=true
 	else
 		pacman --noconfirm --needed -Sy grub >/dev/null 2>>error.txt || error=true
 		grub-install --target=i386-pc --recheck $device >/dev/null 2>>error.txt || error=true
@@ -206,10 +218,19 @@ aichroot() {
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
 	# Fetch
-	printf "\n# # Run fetch if installed\n# if command -v pfetch >/dev/null ; then pfetch\n# elif command -v neofetch >/dev/null ; then neofetch\n# elif command -v screenfetch >/dev/null ; then screenfetch\n# fi" >> /etc/bash.bashrc
+	echo "
+# # Run fetch if installed
+# if command -v pfetch >/dev/null ; then pfetch
+# elif command -v neofetch >/dev/null ; then neofetch
+# elif command -v screenfetch >/dev/null ; then screenfetch
+# fi" >> /etc/bash.bashrc
 	# xorg.conf keyboard settings
 	mkdir -p /etc/X11/xorg.conf.d/
-	printf 'Section "InputClass"\n\tIdentifier "system-keyboard"\n\tMatchIsKeyboard "on"\n\tOption "XkbLayout" "%s"\nEndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
+	printf 'Section "InputClass"
+	Identifier "system-keyboard"
+	MatchIsKeyboard "on"
+	Option "XkbLayout" "%s"
+EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	showresult
 
 	# Adding user and setting password
