@@ -19,7 +19,7 @@ swapsize="auto"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
 installyay=true		# Install yay AUR helper (true/false)
 			# Also installs: base-devel git go sudo
 
-# pkglist.txt for extra packages (blank will use pkglist.txt from pwd)
+# pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
 pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
@@ -230,6 +230,7 @@ aichroot() {
 	Identifier "system-keyboard"
 	MatchIsKeyboard "on"
 	Option "XkbLayout" "%s"
+	Option "XkbOptions" "nbsp:none"
 EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	showresult
 

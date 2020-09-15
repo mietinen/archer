@@ -12,7 +12,6 @@ bash-completion
 
 # Network
 networkmanager
-network-manager-applet
 nm-connection-editor
 networkmanager-dmenu-git #AUR
 networkmanager-l2tp #AUR
@@ -37,19 +36,20 @@ pcmanfm-gtk3
 xarchiver
 gnome-keyring
 
-# Xfce4 desktop
-xfce4
--xfce4-terminal
-mousepad
-thunar-archive-plugin
-xfce4-clipman-plugin
-xfce4-datetime-plugin
-xfce4-notifyd
-xfce4-pulseaudio-plugin
-xfce4-screensaver
-xfce4-screenshooter
-xfce4-taskmanager
-xfce4-whiskermenu-plugin
+# # Xfce4 desktop
+# xfce4
+# -xfce4-terminal
+# mousepad
+# thunar-archive-plugin
+# xfce4-clipman-plugin
+# xfce4-datetime-plugin
+# xfce4-notifyd
+# xfce4-pulseaudio-plugin
+# xfce4-screensaver
+# xfce4-screenshooter
+# xfce4-taskmanager
+# xfce4-whiskermenu-plugin
+# network-manager-applet
 
 # Desktop manager, themes
 lightdm

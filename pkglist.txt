@@ -15,7 +15,7 @@ bash-completion
 neovim
 nano
 nnn
-shellcheck
+shellcheck-bin #AUR
 tmux
 htop
 xclip
