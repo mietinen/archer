@@ -121,7 +121,7 @@ aistart() {
 	# Downloading pkglist.txt
 	if [ "$pkglist" != "" ] ; then
 		printm 'Downloading pkglist.txt'
-		wget "$pkglist" -O /mnt/root/pkglist.txt >/dev/null 2>>error.txt || error=true
+		curl -o /mnt/root/pkglist.txt -sL "$pkglist" >/dev/null 2>>error.txt || error=true
 		showresult
 	elif [ -f pkglist.txt ] ; then
 		printm 'Copying pkglist.txt'

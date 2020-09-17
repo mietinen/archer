@@ -6,7 +6,7 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 * /root partition (Auto)
 * swap partitoon (Auto/manual/none)
 
-Download script `wget https://gitlab.com/mietinen/archer/-/raw/master/archer.sh`
+Download script `curl -O https://gitlab.com/mietinen/archer/-/raw/master/archer.sh`
 
 Edit archer.sh `vim archer.sh`
 
