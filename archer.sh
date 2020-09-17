@@ -237,6 +237,7 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	# Adding user and setting password
 	printm 'Adding user and setting password'
 	mkdir -p /etc/sudoers.d/
+	chmod 750 /etc/sudoers.d/
 	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
 	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
