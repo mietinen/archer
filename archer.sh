@@ -281,7 +281,7 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	fi
 
 	# Enabeling services
-	printm 'Enabeling services'
+	printm 'Enabeling services (Created symlink "errors" can be ignored)'
 	# Services: network manager
 	if pacman -Q networkmanager >/dev/null 2>&1 ; then
 		systemctl enable NetworkManager.service >/dev/null 2>>error.txt || error=true
@@ -318,7 +318,16 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 
 # Printing OK/ERROR
 showresult() {
-	[ "$error" ] && printf ' \e[41m[ERROR]\e[m\n' || printf ' \e[42m[OK]\e[m\n'
+	if [ "$error" ] ; then
+		printf ' \e[1;31m[ERROR]\e[m\n'
+		cat error.txt 2>/dev/null
+		printf '\e[1mExit installer? [Y/n]\e[m\n'
+		read exit < /dev/tty
+		[ "$exit" != "${exit#[Yy]}" ] && exit
+	else
+		printf ' \e[1;32m[OK]\e[m\n'
+	fi
+	rm error.txt >/dev/null 2>&1
 	unset error
 }
 # Padding
@@ -329,7 +338,7 @@ printm() {
 }
 
 
-if [[ "$1" == "--chroot" ]]; then 
+if [[ "$1" == "--chroot" ]]; then
 	aichroot
 else
 	aistart
