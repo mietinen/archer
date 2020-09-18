@@ -32,7 +32,7 @@ dunst
 nitrogen
 arandr
 xss-lock
-pcmanfm-gtk3
+thunar
 xarchiver
 gnome-keyring
 
