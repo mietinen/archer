@@ -217,13 +217,6 @@ aichroot() {
 	grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf # Pacman colors
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
-	# Fetch
-	echo "
-# # Run fetch if installed
-# if command -v pfetch >/dev/null ; then pfetch
-# elif command -v neofetch >/dev/null ; then neofetch
-# elif command -v screenfetch >/dev/null ; then screenfetch
-# fi" >> /etc/bash.bashrc
 	# xorg.conf keyboard settings
 	mkdir -p /etc/X11/xorg.conf.d/
 	printf 'Section "InputClass"
