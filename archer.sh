@@ -23,7 +23,7 @@ installyay=true		# Install yay AUR helper (true/false)
 pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo="https://gitlab.com/mietinen/dotfiles.git"
+dotfilesrepo="https://gitlab.com/mietinen/shell.git"
 
 
 # # # # # # # # # # # # # # # # #
