@@ -93,13 +93,25 @@ aistart() {
 		mkfs.ext4 $bootdev >/dev/null 2>>error.txt || error=true
 	fi
 	[ "$swapdev" != "" ] && mkswap -f "$swapdev" >/dev/null 2>>error.txt || error=true
-	mkfs.ext4 "$rootdev" >/dev/null 2>>error.txt || error=true
+	mkfs.btrfs -f "$rootdev" >/dev/null 2>>error.txt || error=true
+
+	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@root >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@home >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@var >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@srv >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
+	umount /mnt >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Mounting partitions
 	printm 'Mounting partitions'
-	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
-	mkdir -p /mnt/{boot,home} >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@root "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
+	mkdir -p /mnt/{boot,home,var,srv,.snapshots} >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@home "$rootdev" /mnt/home >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@var "$rootdev" /mnt/var >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@srv "$rootdev" /mnt/srv >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@snapshots "$rootdev" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	mount "$bootdev" /mnt/boot >/dev/null 2>>error.txt || error=true
 	if [ "$swapdev" != "" ] ; then swapon "$swapdev" >/dev/null 2>>error.txt || error=true ; fi
 	showresult
@@ -112,7 +124,7 @@ aistart() {
 
 	# Installing base to disk
 	printm 'Installing base to disk'
-	pacstrap /mnt base linux linux-firmware >/dev/null 2>>error.txt || error=true
+	pacstrap /mnt base linux linux-firmware btrfs-progs >/dev/null 2>>error.txt || error=true
 	genfstab -U /mnt >> /mnt/etc/fstab 2>>error.txt || error=true
 	cp "${0}" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
@@ -178,17 +190,18 @@ aichroot() {
 
 	# Creating new initramfs
 	printm 'Creating new initramfs'
+	sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
 	mkinitcpio -P >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Installing bootloader
 	printm 'Installing bootloader'
 	if [ "$useefi" = true ] ; then
-		pacman --noconfirm --needed -Sy grub efibootmgr >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm --needed -Sy grub grub-btrfs efibootmgr >/dev/null 2>>error.txt || error=true
 		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck $device \
 			>/dev/null 2>>error.txt || error=true
 	else
-		pacman --noconfirm --needed -Sy grub >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
 		grub-install --target=i386-pc --recheck $device >/dev/null 2>>error.txt || error=true
 	fi
 	grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>>error.txt || error=true
@@ -198,7 +211,7 @@ aichroot() {
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
 		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort)"
-		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//')"
+		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//')" || error=true
 		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
 		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
 		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ') || error=true
@@ -212,7 +225,7 @@ aichroot() {
 		showresult
 	fi
 
-	# Enabeling services, editing som /etc files
+	# Editing som /etc files
 	printm 'Editing som /etc files'
 	grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf # Pacman colors
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
