@@ -314,7 +314,7 @@ showresult() {
 	if [ "$error" ] ; then
 		printf ' \e[1;31m[ERROR]\e[m\n'
 		cat error.txt 2>/dev/null
-		printf '\e[1mExit installer? [Y/n]\e[m\n'
+		printf '\e[1mExit installer? [y/N]\e[m\n'
 		read exit < /dev/tty
 		[ "$exit" != "${exit#[Yy]}" ] && exit
 	else
