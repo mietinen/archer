@@ -230,6 +230,7 @@ aichroot() {
 	grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf # Pacman colors
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
+	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf # Disable internal speaker
 	# xorg.conf keyboard settings
 	mkdir -p /etc/X11/xorg.conf.d/
 	printf 'Section "InputClass"
