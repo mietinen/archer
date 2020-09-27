@@ -9,6 +9,7 @@ xorg
 xdg-user-dirs
 pulseaudio
 bash-completion
+snapper
 
 # Network
 networkmanager

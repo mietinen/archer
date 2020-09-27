@@ -10,6 +10,7 @@ openssh
 dhcpcd
 lm_sensors
 bash-completion
+snapper
 
 # Terminal apps
 neovim
