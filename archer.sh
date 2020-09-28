@@ -292,12 +292,16 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	# Services: network manager
 	if pacman -Q networkmanager >/dev/null 2>&1 ; then
 		systemctl enable NetworkManager.service >/dev/null 2>>error.txt || error=true
+		systemctl enable NetworkManager-wait-online.service >/dev/null 2>>error.txt || error=true
 	elif pacman -Q connman >/dev/null 2>&1 ; then
 		systemctl enable connman.service >/dev/null 2>>error.txt || error=true
 	elif pacman -Q wicd >/dev/null 2>&1 ; then
 		systemctl enable wicd.service >/dev/null 2>>error.txt || error=true
 	elif pacman -Q dhcpcd >/dev/null 2>&1 ; then
 		systemctl enable dhcpcd.service >/dev/null 2>>error.txt || error=true
+	else
+		systemctl enable systemd-networkd.service >/dev/null 2>>error.txt || error=true
+		systemctl enable systemd-networkd-wait-online.service >/dev/null 2>>error.txt || error=true
 	fi
 	# Services: display manager
 	if pacman -Q lightdm >/dev/null 2>&1 ; then
@@ -318,6 +322,8 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 		systemctl enable fstrim.timer 2>>error.txt || error=true
 	pacman -Q bluez >/dev/null 2>&1 && \
 		systemctl enable bluetooth.service >/dev/null 2>>error.txt || error=true
+	pacman -Q modemmanager >/dev/null 2>&1 && \
+		systemctl enable ModemManager.service >/dev/null 2>>error.txt || error=true
 	showresult
 	rm -f /etc/sudoers.d/wheelnopasswd >/dev/null 2>>error.txt
 
