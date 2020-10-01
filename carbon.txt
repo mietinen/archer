@@ -96,6 +96,7 @@ shellcheck-bin #AUR
 irssi
 tmux
 htop
+pv
 whois
 neofetch
 rxvt-unicode

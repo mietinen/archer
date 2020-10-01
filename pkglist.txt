@@ -19,7 +19,9 @@ nnn
 shellcheck-bin #AUR
 tmux
 htop
-xclip
+pv
+whois
+neofetch
 expac
 neofetch
 reflector
