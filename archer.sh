@@ -2,8 +2,9 @@
 
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 400M	/boot partition
-#					 	/root partition
-#						Auto/manual/none swap partitoon
+# 						btrfs root partition
+#		@root, @home, @var, @srv, @snapshots, @swap subvolumes
+#						Auto/manual/none swap file
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
 # Some settings
@@ -15,7 +16,8 @@ language="en_GB"	# Language for locale.conf (en_GB for english with sane time fo
 locale="nb_NO"		# Numbers, messurement, etc. for locale.conf (safe to use same as language)
 keymap="no"		# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
+swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
+encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
 installyay=true		# Install yay AUR helper (true/false)
 			# Also installs: base-devel git go sudo
 
@@ -33,19 +35,15 @@ dotfilesrepo="https://gitlab.com/mietinen/shell.git"
 if [ "${device::8}" == "/dev/nvm" ] ; then
 	bootdev=${device}"p1"
 	rootdev=${device}"p2"
-	swapdev=${device}"p3"
 else
 	bootdev=${device}"1"
 	rootdev=${device}"2"
-	swapdev=${device}"3"
 fi
+rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
 
-# Set size of swap partition same as total memory if set as auto
+# Set size of swap file same as total memory if set as auto
 [ "$swapsize" = "auto" ] && \
-	swapsize=$((($(grep MemTotal /proc/meminfo | awk '{ print $2 }')+500000)/1000000))"G"
-
-# Disable swap partition if set to 0
-[ "$swapsize" = "0" ] && swapdev=""
+	swapsize=$((($(grep MemTotal /proc/meminfo | awk '{ print $2 }')+500)/1000))
 
 # Run at launch
 aistart() {
@@ -57,33 +55,34 @@ aistart() {
 	fi
 
 	# Setting up keyboard and clock
-	printm 'Setting up keyboard and clock'
-	loadkeys ${keymap} >/dev/null 2>>error.txt || error=true
-	timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
-	showresult
+	# printm 'Setting up keyboard and clock'
+	# loadkeys ${keymap} >/dev/null 2>>error.txt || error=true
+	# timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
+	# showresult
 
 	# Setting up partitions
 	printm 'Setting up partitions'
 	if [ "$useefi" = true ] ; then
 		parted -s $device mklabel gpt >/dev/null 2>>error.txt || error=true
 		sgdisk $device -n=1:0:+400M -t=1:ef00 >/dev/null 2>>error.txt || error=true
-		if [ "$swapdev" != "" ] ; then
-			sgdisk $device -n=2:0:-${swapsize} >/dev/null 2>>error.txt || error=true
-			sgdisk $device -n=3:0:0 -t=3:8200 >/dev/null 2>>error.txt || error=true
-		else
-			sgdisk $device -n=2:0:0 >/dev/null 2>>error.txt || error=true
-		fi
+		sgdisk $device -n=2:0:0 >/dev/null 2>>error.txt || error=true
 	else
 		parted -s $device mklabel msdos >/dev/null 2>>error.txt || error=true
 		echo -e "n\np\n\n\n+400M\na\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
-		if [ "$swapdev" != "" ] ; then
-			echo -e "n\np\n\n\n-${swapsize}\n\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
-			echo -e "n\np\n\n\nt\n\n82\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
-		else
-			echo -e "n\np\n\n\n\nw" | fdisk ${device} >/dev/null 2>>error.txt || error=true
-		fi
+		echo -e "n\np\n\n\n\nw" | fdisk ${device} >/dev/null 2>>error.txt || error=true
 	fi
 	showresult
+
+	# Setting up encryption
+	if [ "$encrypt" = true ] ; then
+		printm 'Setting up encryption'
+		echo
+		cryptsetup -q luksFormat --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" 2>>error.txt || error=true
+		cryptsetup -q open "$rootdev" root 2>>error.txt || error=true
+		rootdev="/dev/mapper/root"
+		printm 'Encryption setup'
+		showresult
+	fi
 
 	# Formating partitions
 	printm 'Formating partitions'
@@ -92,7 +91,6 @@ aistart() {
 	else
 		mkfs.ext4 $bootdev >/dev/null 2>>error.txt || error=true
 	fi
-	[ "$swapdev" != "" ] && mkswap -f "$swapdev" >/dev/null 2>>error.txt || error=true
 	mkfs.btrfs -f "$rootdev" >/dev/null 2>>error.txt || error=true
 
 	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
@@ -101,6 +99,9 @@ aistart() {
 	btrfs subvolume create /mnt/@var >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@srv >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
+	if [ "$swapsize" != "0" ] ; then
+		btrfs subvolume create /mnt/@swap >/dev/null 2>>error.txt || error=true
+	fi
 	umount /mnt >/dev/null 2>>error.txt || error=true
 	showresult
 
@@ -112,14 +113,24 @@ aistart() {
 	mount -o subvol=@var "$rootdev" /mnt/var >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@srv "$rootdev" /mnt/srv >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@snapshots "$rootdev" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
+	if [ "$swapsize" != "0" ] ; then
+		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
+		mount -o subvol=@swap "$rootdev" /mnt/.swap >/dev/null 2>>error.txt || error=true
+		truncate -s 0 /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
+		chattr +C /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
+		btrfs property set /mnt/.swap/swapfile compression none >/dev/null 2>>error.txt || error=true
+		dd if=/dev/zero of=/mnt/.swap/swapfile bs=1M count="$swapsize" >/dev/null 2>>error.txt || error=true
+		chmod 600 /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
+		mkswap /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
+		swapon /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
+	fi
 	mount "$bootdev" /mnt/boot >/dev/null 2>>error.txt || error=true
-	if [ "$swapdev" != "" ] ; then swapon "$swapdev" >/dev/null 2>>error.txt || error=true ; fi
 	showresult
 
 	# Installing and running reflector to generate mirrorlist
 	printm 'Installing and running reflector to generate mirrorlist'
 	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
-	reflector -l 100 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
+	reflector -l 50 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Installing base to disk
@@ -191,17 +202,25 @@ aichroot() {
 	# Creating new initramfs
 	printm 'Creating new initramfs'
 	sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
+	if [ "$encrypt" = true ] ; then
+		sed -i '/^HOOKS=/s/\(filesystems\)/encrypt \1/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
+		sed -i '/^HOOKS=/s/\(block\)/keyboard keymap \1/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
+	fi
 	mkinitcpio -P >/dev/null 2>>error.txt || error=true
 	showresult
 
 	# Installing bootloader
 	printm 'Installing bootloader'
+	pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
+	if [ "$encrypt" = true ] ; then
+		sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid:root"':allow-discards"/' /etc/default/grub >/dev/null 2>>error.txt || error=true
+		sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub >/dev/null 2>>error.txt || error=true
+	fi
 	if [ "$useefi" = true ] ; then
-		pacman --noconfirm --needed -Sy grub grub-btrfs efibootmgr >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm --needed -Sy efibootmgr >/dev/null 2>>error.txt || error=true
 		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck $device \
 			>/dev/null 2>>error.txt || error=true
 	else
-		pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
 		grub-install --target=i386-pc --recheck $device >/dev/null 2>>error.txt || error=true
 	fi
 	grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>>error.txt || error=true
