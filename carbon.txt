@@ -110,8 +110,7 @@ qalculate-gtk
 chromium
 syncthing
 discord
-spotify #AUR
+#spotify #AUR
 plex-media-player #AUR
 ookla-speedtest-bin #AUR
 iperf3
-wireshark-qt
