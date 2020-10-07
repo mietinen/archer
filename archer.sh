@@ -2,8 +2,8 @@
 
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 400M	/boot partition
-# 						btrfs root partition
-#		@root, @home, @var, @srv, @snapshots, @swap subvolumes
+#						btrfs root partition
+# @root, @home, @srv, @vcache, @vlog, @vtmp, @snapshots, @swap subvolumes
 #						Auto/manual/none swap file
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
@@ -18,8 +18,9 @@ keymap="no"		# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
 encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
-installyay=true		# Install yay AUR helper (true/false)
-			# Also installs: base-devel git go sudo
+multilib=false		# Enable multilib (true/false)
+aurhelper="yay"		# Install AUR helper (yay,paru.. blank for none)
+			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
 pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
@@ -33,11 +34,11 @@ dotfilesrepo="https://gitlab.com/mietinen/shell.git"
 # # # # # # # # # # # # # # # # #
 
 if [ "${device::8}" == "/dev/nvm" ] ; then
-	bootdev=${device}"p1"
-	rootdev=${device}"p2"
+	bootdev="${device}p1"
+	rootdev="${device}p2"
 else
-	bootdev=${device}"1"
-	rootdev=${device}"2"
+	bootdev="${device}1"
+	rootdev="${device}2"
 fi
 rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
 
@@ -55,21 +56,21 @@ aistart() {
 	fi
 
 	# Setting up keyboard and clock
-	# printm 'Setting up keyboard and clock'
-	# loadkeys ${keymap} >/dev/null 2>>error.txt || error=true
-	# timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
-	# showresult
+	printm 'Setting up keyboard and clock'
+	loadkeys "$keymap" >/dev/null 2>>error.txt || error=true
+	timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
+	showresult
 
 	# Setting up partitions
 	printm 'Setting up partitions'
 	if [ "$useefi" = true ] ; then
-		parted -s $device mklabel gpt >/dev/null 2>>error.txt || error=true
-		sgdisk $device -n=1:0:+400M -t=1:ef00 >/dev/null 2>>error.txt || error=true
-		sgdisk $device -n=2:0:0 >/dev/null 2>>error.txt || error=true
+		parted -s "$device" mklabel gpt >/dev/null 2>>error.txt || error=true
+		sgdisk "$device" -n=1:0:+400M -t=1:ef00 >/dev/null 2>>error.txt || error=true
+		sgdisk "$device" -n=2:0:0 >/dev/null 2>>error.txt || error=true
 	else
-		parted -s $device mklabel msdos >/dev/null 2>>error.txt || error=true
-		echo -e "n\np\n\n\n+400M\na\nw" | fdisk $device >/dev/null 2>>error.txt || error=true
-		echo -e "n\np\n\n\n\nw" | fdisk ${device} >/dev/null 2>>error.txt || error=true
+		parted -s "$device" mklabel msdos >/dev/null 2>>error.txt || error=true
+		echo -e "n\np\n\n\n+400M\na\nw" | fdisk "$device" >/dev/null 2>>error.txt || error=true
+		echo -e "n\np\n\n\n\nw" | fdisk "$device" >/dev/null 2>>error.txt || error=true
 	fi
 	showresult
 
@@ -87,17 +88,19 @@ aistart() {
 	# Formating partitions
 	printm 'Formating partitions'
 	if [ "$useefi" = true ] ; then
-		mkfs.vfat $bootdev >/dev/null 2>>error.txt || error=true
+		mkfs.vfat "$bootdev" >/dev/null 2>>error.txt || error=true
 	else
-		mkfs.ext4 $bootdev >/dev/null 2>>error.txt || error=true
+		mkfs.ext4 "$bootdev" >/dev/null 2>>error.txt || error=true
 	fi
 	mkfs.btrfs -f "$rootdev" >/dev/null 2>>error.txt || error=true
 
 	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@root >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@home >/dev/null 2>>error.txt || error=true
-	btrfs subvolume create /mnt/@var >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@srv >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@vcache >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@vlog >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@vtmp >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		btrfs subvolume create /mnt/@swap >/dev/null 2>>error.txt || error=true
@@ -108,10 +111,12 @@ aistart() {
 	# Mounting partitions
 	printm 'Mounting partitions'
 	mount -o subvol=@root "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
-	mkdir -p /mnt/{boot,home,var,srv,.snapshots} >/dev/null 2>>error.txt || error=true
+	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@home "$rootdev" /mnt/home >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@var "$rootdev" /mnt/var >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@srv "$rootdev" /mnt/srv >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vcache "$rootdev" /mnt/var/cache >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vlog "$rootdev" /mnt/var/log >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vtmp "$rootdev" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@snapshots "$rootdev" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
@@ -135,9 +140,9 @@ aistart() {
 
 	# Installing base to disk
 	printm 'Installing base to disk'
-	pacstrap /mnt base linux linux-firmware btrfs-progs >/dev/null 2>>error.txt || error=true
+	pacstrap /mnt base linux linux-firmware btrfs-progs sudo >/dev/null 2>>error.txt || error=true
 	genfstab -U /mnt >> /mnt/etc/fstab 2>>error.txt || error=true
-	cp "${0}" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
+	cp "$0" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
 
@@ -165,24 +170,24 @@ aistart() {
 aichroot() {
 	# Setting up locale and keyboard
 	printm 'Setting up locale and keyboard'
-	sed -i '/#'${locale}'.UTF-8/s/^#//g' /etc/locale.gen
-	sed -i '/#'${language}'.UTF-8/s/^#//g' /etc/locale.gen
-	sed -i '/#en_US.UTF-8/s/^#//g' /etc/locale.gen # For safety reasons
+	sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen >/dev/null 2>>error.txt || error=true
+	sed -i '/^#'$language'/s/^#//g' /etc/locale.gen >/dev/null 2>>error.txt || error=true
+	sed -i '/^#en_US/s/^#//g' /etc/locale.gen >/dev/null 2>>error.txt || error=true
 	locale-gen >/dev/null 2>>error.txt || error=true
-	printf "KEYMAP=%s\n" "${keymap}" > /etc/vconsole.conf
-	printf "LANG=%s.UTF-8\n" "${language}" > /etc/locale.conf
+	printf "KEYMAP=%s\n" "$keymap" > /etc/vconsole.conf
+	printf "LANG=%s.UTF-8\n" "$language" > /etc/locale.conf
 	printf "LC_COLLATE=C\n" >> /etc/locale.conf
-	printf "LC_ADDRESS=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_CTYPE=%s.UTF-8\n" "${language}" >> /etc/locale.conf
-	printf "LC_IDENTIFICATION=%s.UTF-8\n" "${language}" >> /etc/locale.conf
-	printf "LC_MEASUREMENT=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_MESSAGES=%s.UTF-8\n" "${language}" >> /etc/locale.conf
-	printf "LC_MONETARY=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_NAME=%s.UTF-8\n" "${language}" >> /etc/locale.conf
-	printf "LC_NUMERIC=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_PAPER=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_TELEPHONE=%s.UTF-8\n" "${locale}" >> /etc/locale.conf
-	printf "LC_TIME=%s.UTF-8\n" "${language}" >> /etc/locale.conf
+	printf "LC_ADDRESS=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_CTYPE=%s.UTF-8\n" "$language" >> /etc/locale.conf
+	printf "LC_IDENTIFICATION=%s.UTF-8\n" "$language" >> /etc/locale.conf
+	printf "LC_MEASUREMENT=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_MESSAGES=%s.UTF-8\n" "$language" >> /etc/locale.conf
+	printf "LC_MONETARY=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_NAME=%s.UTF-8\n" "$language" >> /etc/locale.conf
+	printf "LC_NUMERIC=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_PAPER=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_TELEPHONE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+	printf "LC_TIME=%s.UTF-8\n" "$language" >> /etc/locale.conf
 	showresult
 
 	# Setting timezone and adjtime
@@ -196,7 +201,7 @@ aichroot() {
 	printf "%s\n" "$hostname" > /etc/hostname
 	printf "127.0.0.1\tlocalhost\n" > /etc/hosts
 	printf "::1\t\tlocalhost\tip6-localhost\tip6-loopback\n" >> /etc/hosts
-	printf "127.0.1.1\t%s\t%s.local\n" "$hostname" "$hostname" >> /etc/hosts
+	printf "127.0.1.1\t%s\t%s.home.arpa\n" "$hostname" "$hostname" >> /etc/hosts
 	showresult
 
 	# Creating new initramfs
@@ -209,6 +214,15 @@ aichroot() {
 	mkinitcpio -P >/dev/null 2>>error.txt || error=true
 	showresult
 
+	# Changes to pacman.conf and makepkg.conf
+	printm 'Changes to pacman.conf and makepkg.conf'
+	sed -i "s/^#Color/Color/" /etc/pacman.conf >/dev/null 2>>error.txt || error=true
+	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf >/dev/null 2>>error.txt || error=true
+	if [ "$multilib" = true ] ; then
+		sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf >/dev/null 2>>error.txt || error=true
+	fi
+	showresult
+
 	# Installing bootloader
 	printm 'Installing bootloader'
 	pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
@@ -217,11 +231,11 @@ aichroot() {
 		sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub >/dev/null 2>>error.txt || error=true
 	fi
 	if [ "$useefi" = true ] ; then
-		pacman --noconfirm --needed -Sy efibootmgr >/dev/null 2>>error.txt || error=true
-		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck $device \
+		pacman --noconfirm --needed -S efibootmgr >/dev/null 2>>error.txt || error=true
+		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck "$device" \
 			>/dev/null 2>>error.txt || error=true
 	else
-		grub-install --target=i386-pc --recheck $device >/dev/null 2>>error.txt || error=true
+		grub-install --target=i386-pc --recheck "$device" >/dev/null 2>>error.txt || error=true
 	fi
 	grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>>error.txt || error=true
 	showresult
@@ -238,16 +252,14 @@ aichroot() {
 	fi
 
 	# Installing extra packages
-	if [[ $packages != "" ]] ; then
+	if [ "$packages" != "" ] ; then
 		printm 'Installing extra packages'
-		pacman --noconfirm --needed -Sy $packages >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm --needed -S $packages >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
 
 	# Editing som /etc files
 	printm 'Editing som /etc files'
-	grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf # Pacman colors
-	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf # Use all cores for compilation.
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf # Disable internal speaker
 	# xorg.conf keyboard settings
@@ -257,7 +269,7 @@ aichroot() {
 	MatchIsKeyboard "on"
 	Option "XkbLayout" "%s"
 	Option "XkbOptions" "nbsp:none"
-EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
+EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	showresult
 
 	# Adding user and setting password
@@ -267,37 +279,43 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
 	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
-	useradd -m -g wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
+	useradd -m -G wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
+	# Wireshark group
+	if pacman -Q wireshark-cli >/dev/null 2>&1 ; then
+		usermod -aG wireshark "$username" >/dev/null 2>>error.txt || error=true
+	fi
 	showresult
-	passwd $username
+	passwd "$username"
 
-	if [ "$installyay" = true ] ; then
-		# Installing yay AUR helper
-		printm 'Installing yay AUR helper'
-		pacman --noconfirm --needed -Sy base-devel git go sudo >/dev/null 2>>error.txt || error=true
+	if [ "$aurhelper" != "" ] ; then
+		# Installing AUR helper
+		printm "Installing AUR helper ($aurhelper)"
+		pacman --noconfirm --needed -S base-devel git >/dev/null 2>>error.txt || error=true
 		cd /tmp >/dev/null 2>>error.txt || error=true
-		sudo -u "$username" git clone https://aur.archlinux.org/yay.git >/dev/null 2>>error.txt || error=true
-		cd yay >/dev/null 2>>error.txt || error=true
+		sudo -u "$username" git clone "https://aur.archlinux.org/$aurhelper.git" >/dev/null 2>>error.txt || error=true
+		cd "$aurhelper" >/dev/null 2>>error.txt || error=true
 		sudo -u "$username" makepkg --noconfirm -si >/dev/null 2>>error.txt || error=true
 		showresult
-		if [[ $aurpackages != "" ]] ; then
-			printm 'Installing AUR packages'
-			sudo -u "$username" yay -S --noconfirm $aurpackages >/dev/null 2>>error.txt || error=true
+		if [ "$aurpackages" != "" ] ; then
+			printm 'Installing AUR packages (Failures can be checked out manually later)'
+			for aur in $aurpackages; do 
+				sudo -u "$username" "$aurhelper" -S --noconfirm "$aur" >/dev/null 2>>error.txt || error=true
+			done
 			showresult
 		fi
 	fi
 
 	# Removing unwanted packages
-	if [[ $rempackages != "" ]] ; then
+	if [ "$rempackages" != "" ] ; then
 		printm 'Removing unwanted packages'
-		pacman --noconfirm  -Rsu $(pacman -Qq $rempackages) >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm -Rnsu $(pacman -Qq $rempackages 2>/dev/null) >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
 	
 	# Installing dotfiles from git repo
-	if [[ $dotfilesrepo != "" ]] ; then
+	if [ "$dotfilesrepo" != "" ] ; then
 		printm 'Installing dotfiles from git repo'
-		pacman --noconfirm --needed -Sy git sudo >/dev/null 2>>error.txt || error=true
+		pacman --noconfirm --needed -S git >/dev/null 2>>error.txt || error=true
 		tempdir=$(mktemp -d) >/dev/null 2>>error.txt || error=true
 		chown -R "$username:wheel" "$tempdir" >/dev/null 2>>error.txt || error=true
 		sudo -u "$username" git clone --depth 1 "$dotfilesrepo" "$tempdir/dotfiles" >/dev/null 2>>error.txt || error=true
@@ -319,6 +337,12 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	elif pacman -Q dhcpcd >/dev/null 2>&1 ; then
 		systemctl enable dhcpcd.service >/dev/null 2>>error.txt || error=true
 	else
+		eth="$(basename /sys/class/net/en*)"
+		wifi="$(basename /sys/class/net/wl*)"
+		test -d "/sys/class/net/$eth" && \
+			printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=10" "$eth" > /etc/systemd/network/20-wired.network
+		test -d "/sys/class/net/$wifi" && \
+			printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=20" "$wifi" > /etc/systemd/network/25-wireless.network
 		systemctl enable systemd-networkd.service >/dev/null 2>>error.txt || error=true
 		systemctl enable systemd-networkd-wait-online.service >/dev/null 2>>error.txt || error=true
 	fi
@@ -337,12 +361,21 @@ EndSection\n' "${keymap}" > /etc/X11/xorg.conf.d/00-keyboard.conf
 		systemctl enable entrance.service >/dev/null 2>>error.txt || error=true
 	fi
 	# Services: other
-	pacman -Q util-linux >/dev/null 2>&1 && \
+	if pacman -Q util-linux >/dev/null 2>&1 ; then
 		systemctl enable fstrim.timer 2>>error.txt || error=true
-	pacman -Q bluez >/dev/null 2>&1 && \
+	fi
+	if pacman -Q bluez >/dev/null 2>&1 ; then
 		systemctl enable bluetooth.service >/dev/null 2>>error.txt || error=true
-	pacman -Q modemmanager >/dev/null 2>&1 && \
+	fi
+	if pacman -Q modemmanager >/dev/null 2>&1 ; then
 		systemctl enable ModemManager.service >/dev/null 2>>error.txt || error=true
+	fi
+	if pacman -Q avahi >/dev/null 2>&1 ; then
+		systemctl enable avahi-daemon.service >/dev/null 2>>error.txt || error=true
+	fi
+	if pacman -Q autorandr >/dev/null 2>&1 ; then
+		systemctl enable autorandr.service >/dev/null 2>>error.txt || error=true
+	fi
 	showresult
 	rm -f /etc/sudoers.d/wheelnopasswd >/dev/null 2>>error.txt
 
@@ -354,7 +387,7 @@ showresult() {
 		printf ' \e[1;31m[ERROR]\e[m\n'
 		cat error.txt 2>/dev/null
 		printf '\e[1mExit installer? [y/N]\e[m\n'
-		read exit < /dev/tty
+		read -r exit
 		[ "$exit" != "${exit#[Yy]}" ] && exit
 	else
 		printf ' \e[1;32m[OK]\e[m\n'
@@ -370,7 +403,7 @@ printm() {
 }
 
 
-if [[ "$1" == "--chroot" ]]; then
+if [ "$1" == "--chroot" ]; then
 	aichroot
 else
 	aistart

@@ -1,4 +1,4 @@
-# ThinkPad X1 Carbon
+# Desktop computer
 
 # Basic stuff
 base-devel			# Building tools
@@ -16,11 +16,8 @@ networkmanager			# NetworkManager
 nm-connection-editor		# NetworkManager GUI connection editor
 networkmanager-dmenu-git	# NetworkManager menu dmenu/rofi (AUR)
 networkmanager-openvpn		# NetworkManager openvpn support
-wavemon				# Wifi monitoring
 nmap				# Network mapper, Port scanner
 blueman				# GTK+ bluetooth manager
-modemmanager			# 4G/LTE modem manager
-xmm7360-usb-modeswitch-git	# 4G/LTE modem driver (AUR)
 
 # awesome/i3-gaps wm
 awesome				# Awesome window manager
@@ -52,12 +49,11 @@ qt5-styleplugins		# Qt GTK theme support (AUR)
 
 # Utility
 usbutils			# lsusb
-sof-firmware			# Sound driver
 alsa-utils			# ALSA sound utils
 pulseaudio-alsa			# Pulseaudio ALSA manager
-xf86-video-intel		# Intel graphics
-intel-media-driver		# Intel graphics
-solaar				# Logitech mouse config
+nvidia				# Nvidia graphics
+opencl-nvidia			# Nvidia OpenCL
+lib32-nvidia-utils		# Nvidia 32bit support
 dmidecode			# System information
 fwupd				# UEFI bios update
 sshfs				# Mount SSH drives

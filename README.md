@@ -3,8 +3,11 @@
 Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 
 * /boot partition (400M)
-* /root partition (Auto)
-* swap partitoon (Auto/manual/none)
+	* EFI/legacy support
+* root btrfs partition (Auto)
+	* @root, @home, @srv, @vcache, @vlog, @vtmp, @snapshots, @swap subvolumes
+	* dm-crypt/LUKS support
+* swap file (Auto/manual/none)
 
 Download script `curl -O https://gitlab.com/mietinen/archer/-/raw/master/archer.sh`
 
@@ -20,15 +23,17 @@ language="en_GB"	# Language for locale.conf (en_GB for english with sane time fo
 locale="nb_NO"		# Numbers, messurement, etc. for locale.conf (safe to use same as language)
 keymap="no"		# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"		# Size of swap partition (1500M, 8G, auto=MemTotal, 0=no swap)
-installyay=true		# Install yay AUR helper (true/false)
-			# Also installs: base-devel git go sudo
+swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
+encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
+multilib=false		# Enable multilib (true/false)
+aurhelper="yay"		# Install AUR helper (yay,paru.. blank for none)
+			# Also installs: base-devel git
 
-# pkglist.txt for extra packages (blank will use pkglist.txt from pwd)
+# pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
 pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo=""
+dotfilesrepo="https://gitlab.com/mietinen/shell.git"
 ```
 
 Run script `bash archer.sh`
