@@ -80,6 +80,7 @@ ttf-nerd-fonts-symbols		# Font pack
 
 # apps
 neovim				# better VIM editor
+highlight			# CLI code highlighter
 nano				# Fallback editor
 nnn				# Terminal file manager
 trash-cli			# nnn trash support
@@ -106,3 +107,4 @@ discord				# Discord VoIP game chat
 #spotify			# Music streaming (AUR)
 plex-media-player		# Video streaming desktop client (AUR)
 ookla-speedtest-bin		# Speedtest.net CLI client
+ventoy-bin			# Multiboot USB drive (AUR)
