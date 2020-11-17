@@ -27,6 +27,7 @@ pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
 dotfilesrepo="https://gitlab.com/mietinen/shell.git"
+# dotfilesrepo="https://gitlab.com/mietinen/shell.git https://gitlab.com/mietinen/desktop.git"
 
 
 # # # # # # # # # # # # # # # # #
@@ -243,11 +244,11 @@ aichroot() {
 	# Reading packages from pkglist.txt
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort)"
-		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//')" || error=true
-		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
-		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ') || error=true
-		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ') || error=true
+		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort 2>>error.txt)" || error=true
+		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//' 2>>error.txt)" || error=true
+		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
+		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
+		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ' 2>>error.txt) || error=true
 		showresult
 	fi
 
@@ -316,11 +317,13 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	if [ "$dotfilesrepo" != "" ] ; then
 		printm 'Installing dotfiles from git repo'
 		pacman --noconfirm --needed -S git >/dev/null 2>>error.txt || error=true
-		tempdir=$(mktemp -d) >/dev/null 2>>error.txt || error=true
-		chown -R "$username:wheel" "$tempdir" >/dev/null 2>>error.txt || error=true
-		sudo -u "$username" git clone --depth 1 "$dotfilesrepo" "$tempdir/dotfiles" >/dev/null 2>>error.txt || error=true
-		rm -rf "$tempdir/dotfiles/.git" >/dev/null 2>>error.txt || error=true
-		sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username" >/dev/null 2>>error.txt || error=true
+		for repo in $dotfilesrepo ; do
+			tempdir=$(mktemp -d) >/dev/null 2>>error.txt || error=true
+			chown -R "$username:$username" "$tempdir" >/dev/null 2>>error.txt || error=true
+			sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles" >/dev/null 2>>error.txt || error=true
+			rm -rf "$tempdir/dotfiles/.git" >/dev/null 2>>error.txt || error=true
+			sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username" >/dev/null 2>>error.txt || error=true
+		done
 		showresult
 	fi
 
