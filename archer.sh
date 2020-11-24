@@ -23,11 +23,11 @@ aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
-pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
+pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo="https://gitlab.com/mietinen/shell.git"
-# dotfilesrepo="https://gitlab.com/mietinen/shell.git https://gitlab.com/mietinen/desktop.git"
+dotfilesrepo="https://github.com/mietinen/shell.git"
+# dotfilesrepo="https://github.com/mietinen/shell.git https://github.com/mietinen/desktop.git"
 
 
 # # # # # # # # # # # # # # # # #

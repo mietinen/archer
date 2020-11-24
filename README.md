@@ -9,7 +9,7 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 	* dm-crypt/LUKS support
 * swap file (Auto/manual/none)
 
-Download script `curl -O https://gitlab.com/mietinen/archer/-/raw/master/archer.sh`
+Download script `curl -L https://git.io/JkPC9 -o archer.sh`
 
 Edit archer.sh `vim archer.sh`
 
@@ -30,10 +30,10 @@ aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
-pkglist="https://gitlab.com/mietinen/archer/-/raw/master/pkglist.txt"
+pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo="https://gitlab.com/mietinen/shell.git"
+dotfilesrepo="https://github.com/mietinen/shell.git"
 ```
 
 Run script `bash archer.sh`
