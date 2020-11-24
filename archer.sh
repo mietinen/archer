@@ -19,7 +19,7 @@ timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
 encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
 multilib=false		# Enable multilib (true/false)
-aurhelper="yay"		# Install AUR helper (yay,paru.. blank for none)
+aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)

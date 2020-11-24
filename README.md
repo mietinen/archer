@@ -26,7 +26,7 @@ timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
 encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
 multilib=false		# Enable multilib (true/false)
-aurhelper="yay"		# Install AUR helper (yay,paru.. blank for none)
+aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
@@ -41,7 +41,7 @@ Run script `bash archer.sh`
 ## pktlist.txt
 
 You can make you're own pkglist.txt using `pacman -Qqe > pkglist.txt`  
-The script first installs what it finds in official repositories, then tries what's rest from the AUR repositories. Installing AUR packages depends on `yayinstall=true`  
+The script first installs what it finds in official repositories, then tries what's rest from the AUR repositories. Installing AUR packages depends on `aurhelper`  
 Lines starting with an - is removed at the end, if there are no dependencies. Making it posible to install package groups and removing what you dont want. `-xfce4-terminal`
 
 ## Dotfiles
