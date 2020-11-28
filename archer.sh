@@ -41,7 +41,6 @@ else
 	bootdev="${device}1"
 	rootdev="${device}2"
 fi
-rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
 
 # Set size of swap file same as total memory if set as auto
 [ "$swapsize" = "auto" ] && \
@@ -81,9 +80,11 @@ aistart() {
 		echo
 		cryptsetup -q luksFormat --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" 2>>error.txt || error=true
 		cryptsetup -q open "$rootdev" root 2>>error.txt || error=true
-		rootdev="/dev/mapper/root"
+		mapper="/dev/mapper/root"
 		printm 'Encryption setup'
 		showresult
+	else
+		mapper="$rootdev"
 	fi
 
 	# Formating partitions
@@ -93,9 +94,9 @@ aistart() {
 	else
 		mkfs.ext4 "$bootdev" >/dev/null 2>>error.txt || error=true
 	fi
-	mkfs.btrfs -f "$rootdev" >/dev/null 2>>error.txt || error=true
+	mkfs.btrfs -f "$mapper" >/dev/null 2>>error.txt || error=true
 
-	mount "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
+	mount "$mapper" /mnt >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@root >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@home >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@srv >/dev/null 2>>error.txt || error=true
@@ -111,17 +112,17 @@ aistart() {
 
 	# Mounting partitions
 	printm 'Mounting partitions'
-	mount -o subvol=@root "$rootdev" /mnt >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@root "$mapper" /mnt >/dev/null 2>>error.txt || error=true
 	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@home "$rootdev" /mnt/home >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@srv "$rootdev" /mnt/srv >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vcache "$rootdev" /mnt/var/cache >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vlog "$rootdev" /mnt/var/log >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vtmp "$rootdev" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@snapshots "$rootdev" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@home "$mapper" /mnt/home >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@srv "$mapper" /mnt/srv >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vcache "$mapper" /mnt/var/cache >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vlog "$mapper" /mnt/var/log >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@vtmp "$mapper" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@snapshots "$mapper" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
-		mount -o subvol=@swap "$rootdev" /mnt/.swap >/dev/null 2>>error.txt || error=true
+		mount -o subvol=@swap "$mapper" /mnt/.swap >/dev/null 2>>error.txt || error=true
 		truncate -s 0 /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
 		chattr +C /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
 		btrfs property set /mnt/.swap/swapfile compression none >/dev/null 2>>error.txt || error=true
@@ -228,6 +229,7 @@ aichroot() {
 	printm 'Installing bootloader'
 	pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
 	if [ "$encrypt" = true ] ; then
+		rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
 		sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid:root"':allow-discards"/' /etc/default/grub >/dev/null 2>>error.txt || error=true
 		sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub >/dev/null 2>>error.txt || error=true
 	fi
