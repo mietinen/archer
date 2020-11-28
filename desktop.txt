@@ -10,6 +10,7 @@ xdg-user-dirs			# XDG user directories
 pulseaudio			# Pulseaudio sound server
 bash-completion			# Bash compilation
 snapper				# Btrfs snapshots tool
+os-prober			# Windows detect for dual boot
 
 # Network
 networkmanager			# NetworkManager
@@ -18,6 +19,7 @@ networkmanager-dmenu-git	# NetworkManager menu dmenu/rofi (AUR)
 networkmanager-openvpn		# NetworkManager openvpn support
 nmap				# Network mapper, Port scanner
 blueman				# GTK+ bluetooth manager
+ufw				# Uncomplicated Firewall
 
 # awesome/i3-gaps wm
 awesome				# Awesome window manager
@@ -76,6 +78,7 @@ ttf-nerd-fonts-symbols		# Font pack
 
 # apps
 neovim				# better VIM editor
+xxd-standalone			# VIMs hexdump (AUR)
 highlight			# CLI code highlighter
 nano				# Fallback editor
 nnn				# Terminal file manager

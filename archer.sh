@@ -373,6 +373,9 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	if pacman -Q modemmanager >/dev/null 2>&1 ; then
 		systemctl enable ModemManager.service >/dev/null 2>>error.txt || error=true
 	fi
+	if pacman -Q ufw >/dev/null 2>&1 ; then
+		systemctl enable ufw.service >/dev/null 2>>error.txt || error=true
+	fi
 	if pacman -Q avahi >/dev/null 2>&1 ; then
 		systemctl enable avahi-daemon.service >/dev/null 2>>error.txt || error=true
 	fi

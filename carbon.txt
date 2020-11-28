@@ -21,6 +21,7 @@ nmap				# Network mapper, Port scanner
 blueman				# GTK+ bluetooth manager
 modemmanager			# 4G/LTE modem manager
 xmm7360-usb-modeswitch-git	# 4G/LTE modem driver (AUR)
+ufw				# Uncomplicated Firewall
 
 # awesome/i3-gaps wm
 awesome				# Awesome window manager
@@ -80,6 +81,7 @@ ttf-nerd-fonts-symbols		# Font pack
 
 # apps
 neovim				# better VIM editor
+xxd-standalone			# VIMs hexdump (AUR)
 highlight			# CLI code highlighter
 nano				# Fallback editor
 nnn				# Terminal file manager
