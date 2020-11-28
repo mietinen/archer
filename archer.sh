@@ -3,7 +3,7 @@
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 400M	/boot partition
 #						btrfs root partition
-# @root, @home, @srv, @vcache, @vlog, @vtmp, @snapshots, @swap subvolumes
+#		@root, @home, @srv, @var, @snapshots, @swap subvolumes
 #						Auto/manual/none swap file
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
@@ -100,9 +100,10 @@ aistart() {
 	btrfs subvolume create /mnt/@root >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@home >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@srv >/dev/null 2>>error.txt || error=true
-	btrfs subvolume create /mnt/@vcache >/dev/null 2>>error.txt || error=true
-	btrfs subvolume create /mnt/@vlog >/dev/null 2>>error.txt || error=true
-	btrfs subvolume create /mnt/@vtmp >/dev/null 2>>error.txt || error=true
+	btrfs subvolume create /mnt/@var >/dev/null 2>>error.txt || error=true
+	# btrfs subvolume create /mnt/@vcache >/dev/null 2>>error.txt || error=true
+	# btrfs subvolume create /mnt/@vlog >/dev/null 2>>error.txt || error=true
+	# btrfs subvolume create /mnt/@vtmp >/dev/null 2>>error.txt || error=true
 	btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		btrfs subvolume create /mnt/@swap >/dev/null 2>>error.txt || error=true
@@ -116,9 +117,10 @@ aistart() {
 	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@home "$mapper" /mnt/home >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@srv "$mapper" /mnt/srv >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vcache "$mapper" /mnt/var/cache >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vlog "$mapper" /mnt/var/log >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@vtmp "$mapper" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
+	mount -o subvol=@var "$mapper" /mnt/var >/dev/null 2>>error.txt || error=true
+	# mount -o subvol=@vcache "$mapper" /mnt/var/cache >/dev/null 2>>error.txt || error=true
+	# mount -o subvol=@vlog "$mapper" /mnt/var/log >/dev/null 2>>error.txt || error=true
+	# mount -o subvol=@vtmp "$mapper" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@snapshots "$mapper" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
@@ -144,6 +146,8 @@ aistart() {
 	printm 'Installing base to disk'
 	pacstrap /mnt base linux linux-firmware btrfs-progs sudo >/dev/null 2>>error.txt || error=true
 	genfstab -U /mnt >> /mnt/etc/fstab 2>>error.txt || error=true
+	mv /mnt/var/lib/pacman/ /mnt/usr/lib/pacman 2>>error.txt || error=true
+	ln -sf ../../usr/lib/pacman /mnt/var/lib/pacman 2>>error.txt || error=true
 	cp "$0" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
