@@ -40,7 +40,6 @@ xss-lock			# Screen lock
 thunar				# GTK+ file manager
 xarchiver			# Thunar file archive support
 gnome-keyring			# Password management
-lxsession-gtk3			# Polkit
 
 # Desktop manager, themes
 lightdm				# Display manager, logon screen

@@ -38,7 +38,6 @@ xss-lock			# Screen lock
 thunar				# GTK+ file manager
 xarchiver			# Thunar file archive support
 gnome-keyring			# Password management
-lxsession-gtk3			# Polkit
 
 # Desktop manager, themes
 lightdm				# Display manager, logon screen
@@ -76,6 +75,13 @@ ttf-inconsolata			# Font pack
 ttf-linux-libertine		# Font pack
 noto-fonts-emoji		# Font pack
 ttf-nerd-fonts-symbols		# Font pack
+
+# Virtual machines
+qemu				# Virtualizer/emulator
+virt-manager			# VM managing GUI
+dnsmasq				# VM networking
+ebtables			# VM networking
+edk2-ovmf			# VM UEFI support
 
 # apps
 neovim				# better VIM editor
