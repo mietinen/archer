@@ -47,21 +47,25 @@ fi
 	swapsize=$((($(grep MemTotal /proc/meminfo | awk '{ print $2 }')+500)/1000))
 
 # Run at launch
-aistart() {
+archer_check() {
 	if [ ! "$(uname -n)" = "archiso" ]; then
 		echo "This script is ment to be run from the Archlinux live medium." ; exit
 	fi
 	if [ "$(id -u)" -ne 0 ]; then
 		 echo "This script must be run as root." ; exit
 	fi
+}
 
-	# Setting up keyboard and clock
+# Setting up keyboard and clock
+archer_keyclock() {
 	printm 'Setting up keyboard and clock'
 	loadkeys "$keymap" >/dev/null 2>>error.txt || error=true
 	timedatectl set-ntp true >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Setting up partitions
+# Setting up partitions
+archer_partition() {
 	printm 'Setting up partitions'
 	if [ "$useefi" = true ] ; then
 		parted -s "$device" mklabel gpt >/dev/null 2>>error.txt || error=true
@@ -73,8 +77,11 @@ aistart() {
 		echo -e "n\np\n\n\n\nw" | fdisk "$device" >/dev/null 2>>error.txt || error=true
 	fi
 	showresult
+}
 
-	# Setting up encryption
+# Setting up encryption
+archer_encrypt() {
+	mapper="$rootdev"
 	if [ "$encrypt" = true ] ; then
 		printm 'Setting up encryption'
 		echo
@@ -83,11 +90,11 @@ aistart() {
 		mapper="/dev/mapper/root"
 		printm 'Encryption setup'
 		showresult
-	else
-		mapper="$rootdev"
 	fi
+}
 
-	# Formating partitions
+# Formating partitions
+archer_format() {
 	printm 'Formating partitions'
 	if [ "$useefi" = true ] ; then
 		mkfs.vfat "$bootdev" >/dev/null 2>>error.txt || error=true
@@ -110,8 +117,10 @@ aistart() {
 	fi
 	umount /mnt >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Mounting partitions
+# Mounting partitions
+archer_mount() {
 	printm 'Mounting partitions'
 	mount -o subvol=@root "$mapper" /mnt >/dev/null 2>>error.txt || error=true
 	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
@@ -135,8 +144,10 @@ aistart() {
 	fi
 	mount "$bootdev" /mnt/boot >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Installing and running reflector to generate mirrorlist
+# Installing and running reflector to generate mirrorlist
+archer_reflector() {
 	printm 'Installing and running reflector to generate mirrorlist'
 	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
 	reflector -l 50 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
@@ -146,13 +157,11 @@ aistart() {
 	printm 'Installing base to disk'
 	pacstrap /mnt base linux linux-firmware btrfs-progs sudo >/dev/null 2>>error.txt || error=true
 	genfstab -U /mnt >> /mnt/etc/fstab 2>>error.txt || error=true
-	mv /mnt/var/lib/pacman/ /mnt/usr/lib/pacman 2>>error.txt || error=true
-	ln -sf ../../usr/lib/pacman /mnt/var/lib/pacman 2>>error.txt || error=true
-	cp "$0" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
-	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Downloading pkglist.txt
+# Downloading pkglist.txt
+archer_pkgfetch() {
 	if [ "$pkglist" != "" ] ; then
 		printm 'Downloading pkglist.txt'
 		curl -o /mnt/root/pkglist.txt -sL "$pkglist" >/dev/null 2>>error.txt || error=true
@@ -162,19 +171,25 @@ aistart() {
 		cp pkglist.txt /mnt/root/pkglist.txt >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
+}
 
-	# Running arch-chroot
+# Copy script to /mnt/root/archer.sh and running arch-chroot
+# Cleaning up files in /mnt/root
+archer_chroot() {
 	printm 'Running arch-chroot'
-	echo
+	cp "$0" /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
+	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
+	showresult
 	arch-chroot /mnt /root/archer.sh --chroot
-	rm /mnt/root/archer.sh
-	[ -f /mnt/root/pkglist.txt ] && rm /mnt/root/pkglist.txt
-	[ -f /mnt/error.txt ] && cat /mnt/error.txt >>error.txt && rm /mnt/error.txt
+	rm -f /mnt/root/archer.sh \
+		/mnt/root/pkglist.txt \
+		/mnt/error.txt
 }
 
 # Run after arch-chroot
-aichroot() {
-	# Setting up locale and keyboard
+
+# Setting up locale and keyboard
+archer_locale() {
 	printm 'Setting up locale and keyboard'
 	sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen >/dev/null 2>>error.txt || error=true
 	sed -i '/^#'$language'/s/^#//g' /etc/locale.gen >/dev/null 2>>error.txt || error=true
@@ -195,22 +210,28 @@ aichroot() {
 	printf "LC_TELEPHONE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
 	printf "LC_TIME=%s.UTF-8\n" "$language" >> /etc/locale.conf
 	showresult
+}
 
-	# Setting timezone and adjtime
+# Setting timezone and adjtime
+archer_timezone() {
 	printm 'Setting timezone and adjtime'
 	ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime >/dev/null 2>>error.txt || error=true
 	hwclock --systohc >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Setting hostname
+# Setting hostname
+archer_hostname() {
 	printm 'Setting hostname'
 	printf "%s\n" "$hostname" > /etc/hostname
 	printf "127.0.0.1\tlocalhost\n" > /etc/hosts
 	printf "::1\t\tlocalhost\tip6-localhost\tip6-loopback\n" >> /etc/hosts
 	printf "127.0.1.1\t%s\t%s.home.arpa\n" "$hostname" "$hostname" >> /etc/hosts
 	showresult
+}
 
-	# Creating new initramfs
+# Creating new initramfs
+archer_initramfs() {
 	printm 'Creating new initramfs'
 	sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
 	if [ "$encrypt" = true ] ; then
@@ -219,17 +240,25 @@ aichroot() {
 	fi
 	mkinitcpio -P >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Changes to pacman.conf and makepkg.conf
+# Changes to pacman.conf and makepkg.conf
+archer_pacconf() {
 	printm 'Changes to pacman.conf and makepkg.conf'
 	sed -i "s/^#Color/Color/" /etc/pacman.conf >/dev/null 2>>error.txt || error=true
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf >/dev/null 2>>error.txt || error=true
 	if [ "$multilib" = true ] ; then
 		sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf >/dev/null 2>>error.txt || error=true
 	fi
+	# Move DBpath out of /var, to make it a part of @root snapshots
+	mv /var/lib/pacman/ /usr/lib/pacman/ 2>>error.txt || error=true
+	ln -sf ../../usr/lib/pacman/ /var/lib/pacman 2>>error.txt || error=true
+	sed -i 's/^#\?\(DBPath\s\+=\).\+/\1 \/usr\/lib\/pacman\//' /etc/pacman.conf 2>>error.txt || error=true
 	showresult
+}
 
-	# Installing bootloader
+# Installing bootloader
+archer_bootloader() {
 	printm 'Installing bootloader'
 	pacman --noconfirm --needed -Sy grub grub-btrfs >/dev/null 2>>error.txt || error=true
 	if [ "$encrypt" = true ] ; then
@@ -246,8 +275,10 @@ aichroot() {
 	fi
 	grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Reading packages from pkglist.txt
+# Reading packages from pkglist.txt
+archer_readpkg() {
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
 		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort 2>>error.txt)" || error=true
@@ -257,15 +288,19 @@ aichroot() {
 		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ' 2>>error.txt) || error=true
 		showresult
 	fi
+}
 
-	# Installing extra packages
+# Installing extra packages
+archer_pacinstall() {
 	if [ "$packages" != "" ] ; then
 		printm 'Installing extra packages'
 		pacman --noconfirm --needed -S $packages >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
+}
 
-	# Editing som /etc files
+# Editing som /etc files
+archer_etcconf() {
 	printm 'Editing som /etc files'
 	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf # Disable internal speaker
@@ -278,13 +313,16 @@ aichroot() {
 	Option "XkbOptions" "nbsp:none"
 EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	showresult
+}
 
-	# Adding user and setting password
+# Adding user and setting password
+archer_user() {
 	printm 'Adding user and setting password'
 	mkdir -p /etc/sudoers.d/
 	chmod 750 /etc/sudoers.d/
 	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
 	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+	# removed later
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
 	useradd -m -G wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
 	# Wireshark group
@@ -293,7 +331,10 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 	fi
 	showresult
 	passwd "$username"
+}
 
+# Installing AUR helper and packages
+archer_aurinstall() {
 	if [ "$aurhelper" != "" ] ; then
 		# Installing AUR helper
 		printm "Installing AUR helper ($aurhelper)"
@@ -311,15 +352,19 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 			showresult
 		fi
 	fi
+}
 
-	# Removing unwanted packages
+# Removing unwanted packages
+archer_pacremove() {
 	if [ "$rempackages" != "" ] ; then
 		printm 'Removing unwanted packages'
 		pacman --noconfirm -Rnsu $(pacman -Qq $rempackages 2>/dev/null) >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
+}
 	
-	# Installing dotfiles from git repo
+# Installing dotfiles from git repo
+archer_dotfiles() {
 	if [ "$dotfilesrepo" != "" ] ; then
 		printm 'Installing dotfiles from git repo'
 		pacman --noconfirm --needed -S git >/dev/null 2>>error.txt || error=true
@@ -327,13 +372,15 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 			tempdir=$(mktemp -d) >/dev/null 2>>error.txt || error=true
 			chown -R "$username:$username" "$tempdir" >/dev/null 2>>error.txt || error=true
 			sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles" >/dev/null 2>>error.txt || error=true
-			rm -rf "$tempdir/dotfiles/.git" >/dev/null 2>>error.txt || error=true
+			rm -rf "$tempdir/dotfiles/.git"
 			sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username" >/dev/null 2>>error.txt || error=true
 		done
 		showresult
 	fi
+}
 
-	# Enabeling services
+# Enabeling installed services
+archer_services() {
 	printm 'Enabeling services (Created symlink "errors" can be ignored)'
 	# Services: network manager
 	if pacman -Q networkmanager >/dev/null 2>&1 ; then
@@ -389,9 +436,9 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 		systemctl enable autorandr.service >/dev/null 2>>error.txt || error=true
 	fi
 	showresult
-	rm -f /etc/sudoers.d/wheelnopasswd >/dev/null 2>>error.txt
-
 }
+
+
 
 # Printing OK/ERROR
 showresult() {
@@ -404,7 +451,7 @@ showresult() {
 	else
 		printf ' \e[1;32m[OK]\e[m\n'
 	fi
-	rm error.txt >/dev/null 2>&1
+	rm -f error.txt
 	unset error
 }
 # Padding
@@ -415,8 +462,30 @@ printm() {
 }
 
 
-if [ "$1" == "--chroot" ]; then
-	aichroot
+if [ "$1" != "--chroot" ]; then
+	archer_check
+	archer_keyclock
+	archer_partition
+	archer_encrypt
+	archer_format
+	archer_mount
+	archer_reflector
+	archer_pkgfetch
+	archer_chroot
 else
-	aistart
+	archer_locale
+	archer_timezone
+	archer_hostname
+	archer_initramfs
+	archer_pacconf
+	archer_bootloader
+	archer_readpkg
+	archer_pacinstall
+	archer_etcconf
+	archer_user
+	archer_aurinstall
+	archer_pacremove
+	archer_dotfiles
+	archer_services
+	rm -f /etc/sudoers.d/wheelnopasswd
 fi
