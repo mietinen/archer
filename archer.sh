@@ -336,6 +336,7 @@ archer_user() {
 # Installing AUR helper and packages
 archer_aurinstall() {
 	if [ "$aurhelper" != "" ] ; then
+		aurcmd="$(echo "$aurhelper" | sed -r 's/-(bin|git)//g')"
 		# Installing AUR helper
 		printm "Installing AUR helper ($aurhelper)"
 		pacman --noconfirm --needed -S base-devel git >/dev/null 2>>error.txt || error=true
@@ -347,7 +348,7 @@ archer_aurinstall() {
 		if [ "$aurpackages" != "" ] ; then
 			printm 'Installing AUR packages (Failures can be checked out manually later)'
 			for aur in $aurpackages; do 
-				sudo -u "$username" "$aurhelper" -S --noconfirm "$aur" >/dev/null 2>>error.txt || error=true
+				sudo -u "$username" "$aurcmd" -S --noconfirm "$aur" >/dev/null 2>>error.txt || error=true
 			done
 			showresult
 		fi
