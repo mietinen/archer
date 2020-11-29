@@ -19,7 +19,7 @@ timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
 encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
 multilib=false		# Enable multilib (true/false)
-aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
+aurhelper="paru-bin"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
@@ -325,7 +325,10 @@ archer_user() {
 	# removed later
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
 	useradd -m -G wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
-	# Wireshark group
+	# Other groups
+	if pacman -Q libvirt  >/dev/null 2>&1 ; then
+		usermod -aG libvirt "$username" >/dev/null 2>>error.txt || error=true
+	fi
 	if pacman -Q wireshark-cli >/dev/null 2>&1 ; then
 		usermod -aG wireshark "$username" >/dev/null 2>>error.txt || error=true
 	fi
@@ -429,6 +432,9 @@ archer_services() {
 	fi
 	if pacman -Q ufw >/dev/null 2>&1 ; then
 		systemctl enable ufw.service >/dev/null 2>>error.txt || error=true
+	fi
+	if pacman -Q libvirt >/dev/null 2>&1 ; then
+		systemctl enable libvirtd.service >/dev/null 2>>error.txt || error=true
 	fi
 	if pacman -Q avahi >/dev/null 2>&1 ; then
 		systemctl enable avahi-daemon.service >/dev/null 2>>error.txt || error=true
