@@ -152,8 +152,10 @@ archer_reflector() {
 	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
 	reflector -l 50 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
 	showresult
+}
 
-	# Installing base to disk
+# Installing base to disk
+archer_pacstrap() {
 	printm 'Installing base to disk'
 	pacstrap /mnt base linux linux-firmware btrfs-progs sudo >/dev/null 2>>error.txt || error=true
 	genfstab -U /mnt >> /mnt/etc/fstab 2>>error.txt || error=true
@@ -326,7 +328,7 @@ archer_user() {
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
 	useradd -m -G wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
 	# Other groups
-	if pacman -Q libvirt  >/dev/null 2>&1 ; then
+	if pacman -Q libvirt >/dev/null 2>&1 ; then
 		usermod -aG libvirt "$username" >/dev/null 2>>error.txt || error=true
 	fi
 	if pacman -Q wireshark-cli >/dev/null 2>&1 ; then
@@ -477,6 +479,7 @@ if [ "$1" != "--chroot" ]; then
 	archer_format
 	archer_mount
 	archer_reflector
+	archer_pacstrap
 	archer_pkgfetch
 	archer_chroot
 else
