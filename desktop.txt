@@ -85,6 +85,7 @@ edk2-ovmf			# VM UEFI support
 
 # apps
 neovim				# better VIM editor
+neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
 xxd-standalone			# VIMs hexdump (AUR)
 highlight			# CLI code highlighter
 nano				# Fallback editor
