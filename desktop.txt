@@ -38,6 +38,7 @@ xss-lock			# Screen lock
 thunar				# GTK+ file manager
 xarchiver			# Thunar file archive support
 gnome-keyring			# Password management
+scrot				# Simple command-line screenshot
 
 # Desktop manager, themes
 lightdm				# Display manager, logon screen
@@ -76,6 +77,12 @@ ttf-linux-libertine		# Font pack
 noto-fonts-emoji		# Font pack
 ttf-nerd-fonts-symbols		# Font pack
 
+# HP printer
+avahi				# Zero-configuration networking
+nss-mdns			# .local hostname resolution
+cups				# open source printing system
+hplip				# HP Linux Imaging and Printing
+
 # Virtual machines
 qemu				# Virtualizer/emulator
 virt-manager			# VM managing GUI
@@ -104,6 +111,7 @@ rxvt-unicode			# Terminal
 urxvt-perls			# Terminal extras
 urxvt-resize-font-git		# Terminal extras
 reflector			# Pacman mirror update
+gimp				# GNU Image Manipulation Program
 viewnior			# Image viewer
 celluloid			# Video player
 mupdf				# PDF viewer
