@@ -149,7 +149,7 @@ archer_mount() {
 # Installing and running reflector to generate mirrorlist
 archer_reflector() {
 	printm 'Installing and running reflector to generate mirrorlist'
-	pacman --noconfirm --needed -Sy reflector >/dev/null 2>>error.txt || error=true
+	pacman --noconfirm -Sy reflector >/dev/null 2>>error.txt || error=true
 	reflector -l 50 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
 	showresult
 }
