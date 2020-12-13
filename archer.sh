@@ -18,7 +18,7 @@ keymap="no"		# Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
 encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
-multilib=false		# Enable multilib (true/false)
+multilib=true		# Enable multilib (true/false)
 aurhelper="paru-bin"	# Install AUR helper (yay,paru.. blank for none)
 			# Also installs: base-devel git
 
@@ -126,14 +126,14 @@ archer_mount() {
 	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@home "$mapper" /mnt/home >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@srv "$mapper" /mnt/srv >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@var "$mapper" /mnt/var >/dev/null 2>>error.txt || error=true
+	mount -o nodatacow,subvol=@var "$mapper" /mnt/var >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vcache "$mapper" /mnt/var/cache >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vlog "$mapper" /mnt/var/log >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vtmp "$mapper" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@snapshots "$mapper" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
-		mount -o subvol=@swap "$mapper" /mnt/.swap >/dev/null 2>>error.txt || error=true
+		mount -o nodatacow,subvol=@swap "$mapper" /mnt/.swap >/dev/null 2>>error.txt || error=true
 		truncate -s 0 /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
 		chattr +C /mnt/.swap/swapfile >/dev/null 2>>error.txt || error=true
 		btrfs property set /mnt/.swap/swapfile compression none >/dev/null 2>>error.txt || error=true
@@ -239,6 +239,7 @@ archer_initramfs() {
 	if [ "$encrypt" = true ] ; then
 		sed -i '/^HOOKS=/s/\(filesystems\)/encrypt \1/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
 		sed -i '/^HOOKS=/s/\(block\)/keyboard keymap \1/' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
+		sed -i ':s;/^HOOKS=/s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;/^HOOKS=/s/  */ /g' /etc/mkinitcpio.conf >/dev/null 2>>error.txt || error=true
 	fi
 	mkinitcpio -P >/dev/null 2>>error.txt || error=true
 	showresult
@@ -304,8 +305,10 @@ archer_pacinstall() {
 # Editing som /etc files
 archer_etcconf() {
 	printm 'Editing som /etc files'
-	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc # nano syntax highlighting
-	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf # Disable internal speaker
+	# nano syntax highlighting
+	[ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc >/dev/null 2>>error.txt || error=true
+	# Disable internal speaker
+	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf 2>>error.txt || error=true
 	# xorg.conf keyboard settings
 	mkdir -p /etc/X11/xorg.conf.d/
 	printf 'Section "InputClass"
@@ -313,7 +316,16 @@ archer_etcconf() {
 	MatchIsKeyboard "on"
 	Option "XkbLayout" "%s"
 	Option "XkbOptions" "nbsp:none"
-EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
+EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf 2>>error.txt || error=true
+	# .local hostname resolution
+	if pacman -Q nss-mdns >/dev/null 2>&1 ; then
+		grep -e "hosts:.*mdns_minimal" /etc/nsswitch.conf >/dev/null 2>&1 || \
+			sed -i '/^hosts:/s/\(resolve\|dns\)/mdns_minimal \[NOTFOUND=return\] \1/' /etc/nsswitch.conf >/dev/null 2>>error.txt || error=true
+	fi
+	if pacman -Q mlocate >/dev/null 2>&1 ; then
+		grep -e "PRUNENAMES.*\.snapshots" /etc/updatedb.conf >/dev/null 2>&1 || \
+			sed -i '/^PRUNENAMES/s/"\(.*\)"/"\1 .snapshots"/' /etc/updatedb.conf >/dev/null 2>>error.txt || error=true
+	fi
 	showresult
 }
 
@@ -321,9 +333,9 @@ EndSection\n' "$keymap" > /etc/X11/xorg.conf.d/00-keyboard.conf
 archer_user() {
 	printm 'Adding user and setting password'
 	mkdir -p /etc/sudoers.d/
-	chmod 750 /etc/sudoers.d/
-	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
-	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+	chmod 750 /etc/sudoers.d/ 2>>error.txt || error=true
+	echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root 2>>error.txt || error=true
+	echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel 2>>error.txt || error=true
 	# removed later
 	echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
 	useradd -m -G wheel -s /bin/bash "$username" >/dev/null 2>>error.txt || error=true
@@ -440,6 +452,9 @@ archer_services() {
 	fi
 	if pacman -Q avahi >/dev/null 2>&1 ; then
 		systemctl enable avahi-daemon.service >/dev/null 2>>error.txt || error=true
+	fi
+	if pacman -Q cups >/dev/null 2>&1 ; then
+		systemctl enable cups.service >/dev/null 2>>error.txt || error=true
 	fi
 	if pacman -Q autorandr >/dev/null 2>&1 ; then
 		systemctl enable autorandr.service >/dev/null 2>>error.txt || error=true
