@@ -111,7 +111,7 @@ archer_format() {
 	# btrfs subvolume create /mnt/@vcache >/dev/null 2>>error.txt || error=true
 	# btrfs subvolume create /mnt/@vlog >/dev/null 2>>error.txt || error=true
 	# btrfs subvolume create /mnt/@vtmp >/dev/null 2>>error.txt || error=true
-	btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
+	# btrfs subvolume create /mnt/@snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		btrfs subvolume create /mnt/@swap >/dev/null 2>>error.txt || error=true
 	fi
@@ -123,14 +123,15 @@ archer_format() {
 archer_mount() {
 	printm 'Mounting partitions'
 	mount -o subvol=@root "$mapper" /mnt >/dev/null 2>>error.txt || error=true
-	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
+	# mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp,.snapshots} >/dev/null 2>>error.txt || error=true
+	mkdir -p /mnt/{boot,home,srv,var/cache,var/log,var/tmp} >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@home "$mapper" /mnt/home >/dev/null 2>>error.txt || error=true
 	mount -o subvol=@srv "$mapper" /mnt/srv >/dev/null 2>>error.txt || error=true
 	mount -o nodatacow,subvol=@var "$mapper" /mnt/var >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vcache "$mapper" /mnt/var/cache >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vlog "$mapper" /mnt/var/log >/dev/null 2>>error.txt || error=true
 	# mount -o subvol=@vtmp "$mapper" /mnt/var/tmp >/dev/null 2>>error.txt || error=true
-	mount -o subvol=@snapshots "$mapper" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
+	# mount -o subvol=@snapshots "$mapper" /mnt/.snapshots >/dev/null 2>>error.txt || error=true
 	if [ "$swapsize" != "0" ] ; then
 		mkdir -p /mnt/.swap >/dev/null 2>>error.txt || error=true
 		mount -o nodatacow,subvol=@swap "$mapper" /mnt/.swap >/dev/null 2>>error.txt || error=true
@@ -150,7 +151,7 @@ archer_mount() {
 archer_reflector() {
 	printm 'Installing and running reflector to generate mirrorlist'
 	pacman --noconfirm -Sy reflector >/dev/null 2>>error.txt || error=true
-	reflector -l 50 -p http -p https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
+	reflector -l 50 -p http,https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>>error.txt || error=true
 	showresult
 }
 
@@ -285,7 +286,7 @@ archer_readpkg() {
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
 		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort 2>>error.txt)" || error=true
-		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[ \t]*$//' 2>>error.txt)" || error=true
+		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[[:space:]]*$//' 2>>error.txt)" || error=true
 		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
 		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
 		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ' 2>>error.txt) || error=true
@@ -413,9 +414,9 @@ archer_services() {
 	else
 		eth="$(basename /sys/class/net/en*)"
 		wifi="$(basename /sys/class/net/wl*)"
-		test -d "/sys/class/net/$eth" && \
+		[ -d "/sys/class/net/$eth" ] && \
 			printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=10" "$eth" > /etc/systemd/network/20-wired.network
-		test -d "/sys/class/net/$wifi" && \
+		[ -d "/sys/class/net/$wifi" ] && \
 			printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=20" "$wifi" > /etc/systemd/network/25-wireless.network
 		systemctl enable systemd-networkd.service >/dev/null 2>>error.txt || error=true
 		systemctl enable systemd-networkd-wait-online.service >/dev/null 2>>error.txt || error=true
