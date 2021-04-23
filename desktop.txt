@@ -7,7 +7,7 @@ intel-ucode			# Intel Microcode
 openssh				# SSH
 xorg				# Xorg display server
 xdg-user-dirs			# XDG user directories
-pulseaudio			# Pulseaudio sound server
+pipewire			# Multimedia framework
 bash-completion			# Bash compilation
 snapper				# Btrfs snapshots tool
 os-prober			# Windows detect for dual boot
@@ -17,19 +17,18 @@ networkmanager			# NetworkManager
 nm-connection-editor		# NetworkManager GUI connection editor
 networkmanager-dmenu-git	# NetworkManager menu dmenu/rofi (AUR)
 networkmanager-openvpn		# NetworkManager openvpn support
+wavemon				# Wifi monitoring
 nmap				# Network mapper, Port scanner
 blueman				# GTK+ bluetooth manager
 ufw				# Uncomplicated Firewall
 
-# awesome/i3-gaps wm
+# awesome wm
 awesome				# Awesome window manager
-i3-gaps				# i3-gaps window manager
-i3blocks			# i3 status bar
 i3lock				# i3 screen lock
 rofi				# dmenu replacement
+lxsession			# Polkit
 picom				# Compositor for Xorg
 libnotify			# Desktop notifications
-dunst				# Desktop notifications
 nitrogen			# Wallpaper tool
 arandr				# Graphical xrandr front-end
 autorandr			# Auto detect display, xrandr
@@ -52,8 +51,9 @@ qt5-styleplugins		# Qt GTK theme support (AUR)
 
 # Utility
 usbutils			# lsusb
-alsa-utils			# ALSA sound utils
-pulseaudio-alsa			# Pulseaudio ALSA manager
+pipewire-pulse			# PulseAudio replacement
+pamixer				# PulseAudio Volume Control
+pulsemixer			# PulseAudio Volume Control
 nvidia				# Nvidia graphics
 opencl-nvidia			# Nvidia OpenCL
 lib32-nvidia-utils		# Nvidia 32bit support
@@ -70,7 +70,7 @@ libva-utils			# Verifying video HW accel
 mlocate				# locate/updatedb
 xclip				# Clipboard
 expac				# pacman database extraction utility
-xorg-appres			# Xresources i3 themes
+xorg-appres			# Xresources rofi themes
 adobe-source-code-pro-fonts	# Font pack
 ttf-inconsolata			# Font pack
 ttf-linux-libertine		# Font pack
@@ -87,14 +87,14 @@ hplip				# HP Linux Imaging and Printing
 qemu				# Virtualizer/emulator
 virt-manager			# VM managing GUI
 dnsmasq				# VM networking
-ebtables			# VM networking
+iptables-nft			# VM networking
 edk2-ovmf			# VM UEFI support
 
 # apps
 neovim				# better VIM editor
 neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
 xxd-standalone			# VIMs hexdump (AUR)
-highlight			# CLI code highlighter
+bat				# Cat with syntax highlighting
 nano				# Fallback editor
 nnn				# Terminal file manager
 trash-cli			# nnn trash support
@@ -102,6 +102,7 @@ shellcheck-bin			# Check sh/bash scripts (AUR)
 irssi				# IRC client
 tmux				# Terminal multiplexer
 htop				# Process viewer
+nvtop				# Nvidia process viewer
 pv				# Pipe viewer
 whois				# Domain lookup
 iperf3				# Network speed test
@@ -113,9 +114,10 @@ urxvt-resize-font-git		# Terminal extras
 reflector			# Pacman mirror update
 gimp				# GNU Image Manipulation Program
 viewnior			# Image viewer
-celluloid			# Video player
+mpv				# Video player
 mupdf				# PDF viewer
 qalculate-gtk			# Calculator
+firefox				# Web browser
 chromium			# Web browser
 syncthing			# File synchronization
 discord				# Discord VoIP game chat
@@ -123,3 +125,4 @@ discord				# Discord VoIP game chat
 plex-media-player		# Video streaming desktop client (AUR)
 ookla-speedtest-bin		# Speedtest.net CLI client
 ventoy-bin			# Multiboot USB drive (AUR)
+firejail			# Linux namespaces sandbox program
