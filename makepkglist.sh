@@ -25,6 +25,7 @@ echo "# Other packages:"
 gpacs="$(pacman -Sgq $groups | sort)"
 for p in $(comm -23 <(echo "$excl") <(echo "$gpacs")); do
 	desc="$(pacman -Qi "$p" | grep Description | cut -d: -f2)"
-	printf "%-32s%s\n" "$p" "#$desc"
+	pacman -Qm "$p" >/dev/null 2>&1 && aur=" (AUR)" || aur=""
+	printf "%-32s%s\n" "$p" "#$desc$aur"
 done
 	
