@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
 
 # Archer Archlinux install script
-# Setup with EFI/MBR bootloader (GRUB) at 400M	/boot partition
-#						btrfs root partition
-#		@root, @home, @srv, @var, @snapshots, @swap subvolumes
-#						Auto/manual/none swap file
+# Setup with EFI/MBR bootloader (GRUB) at 400M /boot partition
+#               * btrfs root partition
+#                 * @root, @home, @srv, @var, @swap subvolumes
+#                 * Auto/manual/none swap file
+#
 ## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
 
 # Some settings
-hostname="archer"	# Machine hostname
-username="mietinen"	# Main user
-device="/dev/nvme0n1"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
-useefi=true		# Use EFI boot (true/false)
-language="en_GB"	# Language for locale.conf (en_GB for english with sane time format)
-locale="nb_NO"		# Numbers, messurement, etc. for locale.conf (safe to use same as language)
-keymap="no"		# Keymap (localectl list-keymaps)
-timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
-encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
-multilib=true		# Enable multilib (true/false)
-aurhelper="paru-bin"	# Install AUR helper (yay,paru.. blank for none)
-			# Also installs: base-devel git
+hostname="archer"       # Machine hostname
+username="mietinen"     # Main user
+device="/dev/nvme0n1"   # Drive for install (something like /dev/nvme0n1 or /dev/sda)
+useefi=true             # Use EFI boot (true/false)
+language="en_GB"        # Language for locale.conf (en_GB for english with sane time format)
+locale="nb_NO"          # Numbers, messurement, etc. for locale.conf (safe to use same as language)
+keymap="no"             # Keymap (localectl list-keymaps)
+timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
+swapsize="auto"         # Size of swap file in MB (auto=MemTotal, 0=no swap)
+encrypt=true            # Set up dm-crypt/LUKS on root and swap partition
+multilib=true           # Enable multilib (true/false)
+aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
+                        # Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
 pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
@@ -30,9 +31,9 @@ dotfilesrepo="https://github.com/mietinen/shell.git"
 # dotfilesrepo="https://github.com/mietinen/shell.git https://github.com/mietinen/desktop.git"
 
 
-# # # # # # # # # # # # # # # # #
-#	No edit from here	#
-# # # # # # # # # # # # # # # # #
+# -------------------
+#  No edit from here
+# -------------------
 
 if [ "${device::8}" == "/dev/nvm" ] ; then
 	bootdev="${device}p1"
@@ -515,3 +516,5 @@ else
 	archer_services
 	rm -f /etc/sudoers.d/wheelnopasswd
 fi
+
+# vim: set ts=4 sw=4 tw=0 noet :

@@ -94,6 +94,7 @@ edk2-ovmf			# VM UEFI support
 neovim				# better VIM editor
 neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
 xxd-standalone			# VIMs hexdump (AUR)
+lazygit				# Simple terminal UI for git commands
 bat				# Cat with syntax highlighting
 nano				# Fallback editor
 nnn				# Terminal file manager
@@ -126,3 +127,5 @@ plex-media-player		# Video streaming desktop client (AUR)
 ookla-speedtest-bin		# Speedtest.net CLI client
 ventoy-bin			# Multiboot USB drive (AUR)
 firejail			# Linux namespaces sandbox program
+
+# vim: set ts=8 sw=8 tw=0 noet :

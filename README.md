@@ -5,7 +5,7 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 * /boot partition (400M)
 	* EFI/legacy support
 * root btrfs partition (Auto)
-	* @root, @home, @srv, @vcache, @vlog, @vtmp, @snapshots, @swap subvolumes
+	* @root, @home, @srv, @vcache, @vlog, @vtmp, @swap subvolumes
 	* dm-crypt/LUKS support
 * swap file (Auto/manual/none)
 
@@ -15,19 +15,19 @@ Edit archer.sh `vim archer.sh`
 
 ```
 # Some settings
-hostname="archer"	# Machine hostname
-username="mietinen"	# Main user
-device="/dev/nvme0n1"	# Drive for install (something like /dev/nvme0n1 or /dev/sda)
-useefi=true		# Use EFI boot (true/false)
-language="en_GB"	# Language for locale.conf (en_GB for english with sane time format)
-locale="nb_NO"		# Numbers, messurement, etc. for locale.conf (safe to use same as language)
-keymap="no"		# Keymap (localectl list-keymaps)
-timezone="Europe/Oslo"	# Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"		# Size of swap file in MB (auto=MemTotal, 0=no swap)
-encrypt=true		# Set up dm-crypt/LUKS on root and swap partition
-multilib=false		# Enable multilib (true/false)
-aurhelper="paru"	# Install AUR helper (yay,paru.. blank for none)
-			# Also installs: base-devel git
+hostname="archer"       # Machine hostname
+username="mietinen"     # Main user
+device="/dev/nvme0n1"   # Drive for install (something like /dev/nvme0n1 or /dev/sda)
+useefi=true             # Use EFI boot (true/false)
+language="en_GB"        # Language for locale.conf (en_GB for english with sane time format)
+locale="nb_NO"          # Numbers, messurement, etc. for locale.conf (safe to use same as language)
+keymap="no"             # Keymap (localectl list-keymaps)
+timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
+swapsize="auto"         # Size of swap file in MB (auto=MemTotal, 0=no swap)
+encrypt=true            # Set up dm-crypt/LUKS on root and swap partition
+multilib=true           # Enable multilib (true/false)
+aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
+                        # Also installs: base-devel git
 
 # pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
 pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
