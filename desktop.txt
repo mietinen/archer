@@ -94,9 +94,9 @@ edk2-ovmf			# VM UEFI support
 neovim				# better VIM editor
 neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
 xxd-standalone			# VIMs hexdump (AUR)
-lazygit				# Simple terminal UI for git commands
-bat				# Cat with syntax highlighting
 nano				# Fallback editor
+bat				# Cat with syntax highlighting
+lazygit				# Simple terminal UI for git commands
 nnn				# Terminal file manager
 trash-cli			# nnn trash support
 shellcheck-bin			# Check sh/bash scripts (AUR)

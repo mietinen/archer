@@ -14,7 +14,11 @@ snapper
 
 # Terminal apps
 neovim
+neovim-symlinks #AUR
+xxd-standalone #AUR
 nano
+bat
+lazygit
 nnn
 shellcheck-bin #AUR
 tmux
