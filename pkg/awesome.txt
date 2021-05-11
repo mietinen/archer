@@ -1,15 +1,16 @@
-# ThinkPad X1 Carbon
+# Awesome window manager
 
-# Basic stuff
-base-devel			# Building tools
-sudo				# sudo
-intel-ucode			# Intel Microcode
-openssh				# SSH
+# Xorg
 xorg				# Xorg display server
 xdg-user-dirs			# XDG user directories
+xclip				# Clipboard
+xorg-appres			# Xresources rofi themes
+
+# Sound
 pipewire			# Multimedia framework
-bash-completion			# Bash compilation
-snapper				# Btrfs snapshots tool
+pipewire-pulse			# PulseAudio replacement
+pamixer				# PulseAudio Volume Control
+pulsemixer			# PulseAudio Volume Control
 
 # Network
 networkmanager			# NetworkManager
@@ -19,8 +20,6 @@ networkmanager-openvpn		# NetworkManager openvpn support
 wavemon				# Wifi monitoring
 nmap				# Network mapper, Port scanner
 blueman				# GTK+ bluetooth manager
-modemmanager			# 4G/LTE modem manager
-acpi_call			# 4G/LTE modem hack
 ufw				# Uncomplicated Firewall
 
 # awesome wm
@@ -33,16 +32,18 @@ libnotify			# Desktop notifications
 nitrogen			# Wallpaper tool
 arandr				# Graphical xrandr front-end
 autorandr			# Auto detect display, xrandr
-pavucontrol			# PulseAudio Volume Control
+pavucontrol			# PulseAudio GTK Volume Control
 xss-lock			# Screen lock
 thunar				# GTK+ file manager
 xarchiver			# Thunar file archive support
 gnome-keyring			# Password management
 scrot				# Simple command-line screenshot
 
-# Desktop manager, themes
+# Desktop manager
 lightdm				# Display manager, logon screen
 lightdm-gtk-greeter		# Display manager, logon screen
+
+# Theming
 gtk-engine-murrine		# GTK theme engine
 arc-gtk-theme			# GTK theme
 papirus-icon-theme		# Icon theme
@@ -52,27 +53,13 @@ qt5-styleplugins		# Qt GTK theme support (AUR)
 
 # Utility
 usbutils			# lsusb
-sof-firmware			# Sound driver
-pipewire-pulse			# PulseAudio replacement
-pamixer				# PulseAudio Volume Control
-pulsemixer			# PulseAudio Volume Control
-xf86-video-intel		# Intel graphics
-intel-media-driver		# Intel graphics
-solaar				# Logitech mouse config
 dmidecode			# System information
 fwupd				# UEFI bios update
-sshfs				# Mount SSH drives
 smbclient			# SMB client
 gvfs-smb			# Thunar SMB support
-rsync				# Rsync
-unzip				# Zip archive
-unrar				# Rar archive
-lm_sensors			# Temp sensors
 libva-utils			# Verifying video HW accel
-mlocate				# locate/updatedb
-xclip				# Clipboard
-expac				# pacman database extraction utility
-xorg-appres			# Xresources rofi themes
+
+# Fonts
 adobe-source-code-pro-fonts	# Font pack
 ttf-inconsolata			# Font pack
 ttf-linux-libertine		# Font pack
@@ -93,27 +80,10 @@ iptables-nft			# VM networking
 edk2-ovmf			# VM UEFI support
 
 # apps
-neovim				# better VIM editor
-neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
-xxd-standalone			# VIMs hexdump (AUR)
-nano				# Fallback editor
-bat				# Cat with syntax highlighting
-lazygit				# Simple terminal UI for git commands
-nnn				# Terminal file manager
-trash-cli			# nnn trash support
-shellcheck-bin			# Check sh/bash scripts (AUR)
-irssi				# IRC client
-tmux				# Terminal multiplexer
-htop				# Process viewer
-pv				# Pipe viewer
-whois				# Domain lookup
-iperf3				# Network speed test
 wireshark-qt			# Network monitor tool
-neofetch			# Terminal splash
 rxvt-unicode			# Terminal
 urxvt-perls			# Terminal extras
 urxvt-resize-font-git		# Terminal extras
-reflector			# Pacman mirror update
 gimp				# GNU Image Manipulation Program
 viewnior			# Image viewer
 mpv				# Video player
@@ -123,10 +93,8 @@ firefox				# Web browser
 chromium			# Web browser
 syncthing			# File synchronization
 discord				# Discord VoIP game chat
-#spotify			# Music streaming (AUR)
+spotify				# Music streaming (AUR)
 plex-media-player		# Video streaming desktop client (AUR)
-ookla-speedtest-bin		# Speedtest.net CLI client
 ventoy-bin			# Multiboot USB drive (AUR)
-firejail			# Linux namespaces sandbox program
 
 # vim: set ts=8 sw=8 tw=0 noet :

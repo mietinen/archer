@@ -1,0 +1,10 @@
+# ThinkPad X1 Carbon
+
+acpi_call			# 4G/LTE modem hack
+intel-media-driver		# Intel graphics
+modemmanager			# 4G/LTE modem manager
+sof-firmware			# Sound driver
+solaar				# Logitech mouse config
+xf86-video-intel		# Intel graphics
+
+# vim: set ts=8 sw=8 tw=0 noet :

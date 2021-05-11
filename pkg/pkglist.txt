@@ -1,0 +1,40 @@
+# List of packages to be installed
+# Needs 'aurhelper' to be set for AUR packages
+# Can be generated with: pacman -Qqe > pkglist.txt
+
+# Basic stuff
+base-devel			# Building tools
+sudo				# sudo
+openssh				# SSH
+bash-completion			# Bash compilation
+snapper				# Btrfs snapshots tool
+man-pages			# Linux man pages
+intel-ucode			# Intel Microcode
+lm_sensors			# Temp sensors
+sshfs				# Mount SSH drives
+
+# Terminal apps
+neovim				# better VIM editor
+neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
+xxd-standalone			# VIMs hexdump (AUR)
+nano				# Fallback editor
+bat				# Cat with syntax highlighting
+lazygit				# Simple terminal UI for git commands
+mlocate				# locate/updatedb
+nnn				# Terminal file manager
+shellcheck-bin			# Check sh/bash scripts (AUR)
+irssi				# IRC client
+tmux				# Terminal multiplexer
+iperf3				# Network speed test
+ookla-speedtest-bin		# Speedtest.net CLI client (AUR)
+htop				# Process viewer
+pv				# Pipe viewer
+whois				# Domain lookup
+neofetch			# Terminal splash
+expac				# pacman database extraction utility
+reflector			# Pacman mirror update
+rsync				# Rsync
+unzip				# Zip archive
+unrar				# Rar archive
+
+# vim: set ts=8 sw=8 tw=0 noet :

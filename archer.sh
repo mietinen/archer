@@ -23,12 +23,19 @@ multilib=true           # Enable multilib (true/false)
 aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
                         # Also installs: base-devel git
 
-# pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
-pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
+# pkglist.txt for extra packages (none will use pkglist.txt from local directory)
+pkglist=(
+	"https://raw.githubusercontent.com/mietinen/archer/master/pkg/pkglist.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/awesome.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/carbon.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/desktop.txt"
+)
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo="https://github.com/mietinen/shell.git"
-# dotfilesrepo="https://github.com/mietinen/shell.git https://github.com/mietinen/desktop.git"
+dotfilesrepo=(
+	"https://github.com/mietinen/shell.git"
+	# "https://github.com/mietinen/desktop.git"
+)
 
 
 # -------------------
@@ -166,11 +173,17 @@ archer_pacstrap() {
 
 # Downloading pkglist.txt
 archer_pkgfetch() {
-	if [ "$pkglist" != "" ] ; then
+	if [ ${#pkglist[@]} -gt 0 ] ; then
 		printm 'Downloading pkglist.txt'
-		curl -o /mnt/root/pkglist.txt -sL "$pkglist" >/dev/null 2>>error.txt || error=true
+		for pkg in "${pkglist[@]}" ; do
+			echo "# $pkg" >>/mnt/root/pkglist.txt
+			curl -sL "$pkg" >>/mnt/root/pkglist.txt 2>>error.txt || error=true
+			echo >>/mnt/root/pkglist.txt
+		done
 		showresult
-	elif [ -f pkglist.txt ] ; then
+	fi
+
+	if [ ! -r "/mnt/root/pkglist.txt" ] && [ -r "pkglist.txt" ] ; then
 		printm 'Copying pkglist.txt'
 		cp pkglist.txt /mnt/root/pkglist.txt >/dev/null 2>>error.txt || error=true
 		showresult
@@ -185,9 +198,9 @@ archer_chroot() {
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
 	arch-chroot /mnt /root/archer.sh --chroot
-	rm -f /mnt/root/archer.sh \
-		/mnt/root/pkglist.txt \
-		/mnt/error.txt
+	# rm -f /mnt/root/archer.sh \
+	# 	/mnt/root/pkglist.txt \
+	# 	/mnt/error.txt
 }
 
 # Run after arch-chroot
@@ -286,20 +299,20 @@ archer_bootloader() {
 archer_readpkg() {
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
-		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort 2>>error.txt)" || error=true
-		pkgsorted="$(sort /root/pkglist.txt | grep -o '^[^#]*' | grep -v '^-' | sed 's/[[:space:]]*$//' 2>>error.txt)" || error=true
+		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>error.txt)" || error=true
+		pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//' | sort -u 2>>error.txt)" || error=true
 		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
 		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
-		rempackages=$(awk '/^-/ {print substr($1,2)}' /root/pkglist.txt | tr '\n' ' ' 2>>error.txt) || error=true
 		showresult
 	fi
 }
 
 # Installing extra packages
 archer_pacinstall() {
-	if [ "$packages" != "" ] ; then
+	if [ -n "$packages" ] ; then
 		printm 'Installing extra packages'
-		pacman --noconfirm --needed -S $packages >/dev/null 2>>error.txt || error=true
+		# --ask 4: ALPM_QUESTION_CONFLICT_PKG = (1 << 2)
+		pacman --noconfirm --needed --ask 4 -S $packages >/dev/null 2>>error.txt || error=true
 		showresult
 	fi
 }
@@ -354,7 +367,7 @@ archer_user() {
 
 # Installing AUR helper and packages
 archer_aurinstall() {
-	if [ "$aurhelper" != "" ] ; then
+	if [ -n "$aurhelper" ] ; then
 		aurcmd="$(echo "$aurhelper" | sed -r 's/-(bin|git)//g')"
 		# Installing AUR helper
 		printm "Installing AUR helper ($aurhelper)"
@@ -364,7 +377,7 @@ archer_aurinstall() {
 		cd "$aurhelper" >/dev/null 2>>error.txt || error=true
 		sudo -u "$username" makepkg --noconfirm -si >/dev/null 2>>error.txt || error=true
 		showresult
-		if [ "$aurpackages" != "" ] ; then
+		if [ -n "$aurpackages" ] ; then
 			printm 'Installing AUR packages (Failures can be checked out manually later)'
 			for aur in $aurpackages; do 
 				sudo -u "$username" "$aurcmd" -S --noconfirm "$aur" >/dev/null 2>>error.txt || error=true
@@ -374,21 +387,12 @@ archer_aurinstall() {
 	fi
 }
 
-# Removing unwanted packages
-archer_pacremove() {
-	if [ "$rempackages" != "" ] ; then
-		printm 'Removing unwanted packages'
-		pacman --noconfirm -Rnsu $(pacman -Qq $rempackages 2>/dev/null) >/dev/null 2>>error.txt || error=true
-		showresult
-	fi
-}
-	
 # Installing dotfiles from git repo
 archer_dotfiles() {
-	if [ "$dotfilesrepo" != "" ] ; then
+	if [ ${#dotfilesrepo[@]} -gt 0 ] ; then
 		printm 'Installing dotfiles from git repo'
 		pacman --noconfirm --needed -S git >/dev/null 2>>error.txt || error=true
-		for repo in $dotfilesrepo ; do
+		for repo in "${dotfilesrepo[@]}" ; do
 			tempdir=$(mktemp -d) >/dev/null 2>>error.txt || error=true
 			chown -R "$username:$username" "$tempdir" >/dev/null 2>>error.txt || error=true
 			sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles" >/dev/null 2>>error.txt || error=true
@@ -421,6 +425,9 @@ archer_services() {
 			printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=20" "$wifi" > /etc/systemd/network/25-wireless.network
 		systemctl enable systemd-networkd.service >/dev/null 2>>error.txt || error=true
 		systemctl enable systemd-networkd-wait-online.service >/dev/null 2>>error.txt || error=true
+		systemctl enable systemd-resolved.service >/dev/null 2>>error.txt || error=true
+		umount /etc/resolv.conf 2>/dev/null
+		ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf 2>>error.txt || error=true
 	fi
 	# Services: display manager
 	if pacman -Q lightdm >/dev/null 2>&1 ; then
@@ -511,7 +518,6 @@ else
 	archer_etcconf
 	archer_user
 	archer_aurinstall
-	archer_pacremove
 	archer_dotfiles
 	archer_services
 	rm -f /etc/sudoers.d/wheelnopasswd

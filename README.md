@@ -29,11 +29,19 @@ multilib=true           # Enable multilib (true/false)
 aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
                         # Also installs: base-devel git
 
-# pkglist.txt for extra packages (blank will use pkglist.txt from local directory)
-pkglist="https://raw.githubusercontent.com/mietinen/archer/master/pkglist.txt"
+# pkglist.txt for extra packages (none will use pkglist.txt from local directory)
+pkglist=(
+	"https://raw.githubusercontent.com/mietinen/archer/master/pkg/pkglist.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/awesome.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/carbon.txt"
+	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/desktop.txt"
+)
 
 # Dotfiles git repo (blank for none)
-dotfilesrepo="https://github.com/mietinen/shell.git"
+dotfilesrepo=(
+	"https://github.com/mietinen/shell.git"
+	# "https://github.com/mietinen/desktop.git"
+)
 ```
 
 Run script `bash archer.sh`
@@ -42,7 +50,6 @@ Run script `bash archer.sh`
 
 You can make you're own pkglist.txt using the makepkglist.sh script, or simply `pacman -Qqe > pkglist.txt`  
 The script first installs what it finds in official repositories, then tries what's rest from the AUR repositories. Installing AUR packages depends on `aurhelper`  
-Lines starting with an - is removed at the end, if there are no dependencies. Making it posible to install package groups and removing what you dont want. `-xfce4-terminal`
 
 ## Dotfiles
 

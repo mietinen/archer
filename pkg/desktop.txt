@@ -1,0 +1,9 @@
+# Desktop computer
+
+lib32-nvidia-utils		# Nvidia 32bit support
+nvidia				# Nvidia graphics
+nvtop				# Nvidia process viewer
+opencl-nvidia			# Nvidia OpenCL
+os-prober			# Windows detect for dual boot
+
+# vim: set ts=8 sw=8 tw=0 noet :
