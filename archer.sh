@@ -198,9 +198,9 @@ archer_chroot() {
 	chmod 755 /mnt/root/archer.sh >/dev/null 2>>error.txt || error=true
 	showresult
 	arch-chroot /mnt /root/archer.sh --chroot
-	# rm -f /mnt/root/archer.sh \
-	# 	/mnt/root/pkglist.txt \
-	# 	/mnt/error.txt
+	rm -f /mnt/root/archer.sh \
+		/mnt/root/pkglist.txt \
+		/mnt/error.txt
 }
 
 # Run after arch-chroot
@@ -300,7 +300,7 @@ archer_readpkg() {
 	if [ -f /root/pkglist.txt ] ; then
 		printm 'Reading packages from pkglist.txt'
 		reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>error.txt)" || error=true
-		pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//' | sort -u 2>>error.txt)" || error=true
+		pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//;/^[[:space:]]*$/d' | sort -u 2>>error.txt)" || error=true
 		packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
 		aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>error.txt) || error=true
 		showresult
