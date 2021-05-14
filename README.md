@@ -5,7 +5,8 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 * /boot partition (400M)
 	* EFI/legacy support
 * root btrfs partition (Auto)
-	* @root, @home, @srv, @vcache, @vlog, @vtmp, @swap subvolumes
+	* @root, @home, @srv, @var, @swap subvolumes
+	* DBpath moved to /usr/lib/pacman for snapshot
 	* dm-crypt/LUKS support
 * swap file (Auto/manual/none)
 
