@@ -1,9 +1,101 @@
-# Desktop computer
+# Packages for all my desktops (awesome window manager)
 
-lib32-nvidia-utils		# Nvidia 32bit support
-nvidia				# Nvidia graphics
-nvtop				# Nvidia process viewer
-opencl-nvidia			# Nvidia OpenCL
-os-prober			# Windows detect for dual boot
+# Xorg
+xorg				# Xorg display server
+xdg-user-dirs			# XDG user directories
+xclip				# Clipboard
+xorg-appres			# Xresources rofi themes
+
+# Sound
+pipewire			# Multimedia framework
+pipewire-pulse			# PulseAudio replacement
+pamixer				# PulseAudio Volume Control
+pulsemixer			# PulseAudio Volume Control
+
+# Network
+networkmanager			# NetworkManager
+nm-connection-editor		# NetworkManager GUI connection editor
+networkmanager-dmenu-git	# NetworkManager menu dmenu/rofi (AUR)
+networkmanager-openvpn		# NetworkManager openvpn support
+wavemon				# Wifi monitoring
+nmap				# Network mapper, Port scanner
+blueman				# GTK+ bluetooth manager
+ufw				# Uncomplicated Firewall
+
+# awesome wm
+awesome				# window manager
+i3lock				# i3 screen lock
+rofi				# dmenu replacement
+lxsession			# Polkit
+picom				# Compositor for Xorg
+libnotify			# Desktop notifications
+nitrogen			# Wallpaper tool
+arandr				# Graphical xrandr front-end
+autorandr			# Auto detect display, xrandr
+pavucontrol			# PulseAudio GTK Volume Control
+xss-lock			# Screen lock
+thunar				# GTK+ file manager
+xarchiver			# Thunar file archive support
+gnome-keyring			# Password management
+scrot				# Simple command-line screenshot
+
+# Desktop manager
+lightdm				# Display manager, logon screen
+lightdm-gtk-greeter		# Display manager, logon screen
+
+# Theming
+gtk-engine-murrine		# GTK theme engine
+arc-gtk-theme			# GTK theme
+papirus-icon-theme		# Icon theme
+archlinux-wallpaper		# Wallpaper pack
+matcha-gtk-theme		# GTK theme (AUR)
+gnome-themes-extra		# Adwaita GTK theme
+qt5-styleplugins		# Qt GTK theme support (AUR)
+
+# Utility
+usbutils			# lsusb
+dmidecode			# System information
+fwupd				# UEFI bios update
+smbclient			# SMB client
+gvfs-smb			# Thunar SMB support
+libva-utils			# Verifying video HW accel
+
+# Fonts
+adobe-source-code-pro-fonts	# Font pack
+ttf-inconsolata			# Font pack
+ttf-linux-libertine		# Font pack
+noto-fonts-emoji		# Font pack
+ttf-nerd-fonts-symbols		# Font pack
+
+# HP printer
+avahi				# Zero-configuration networking
+nss-mdns			# .local hostname resolution
+cups				# open source printing system
+hplip				# HP Linux Imaging and Printing
+
+# Virtual machines
+qemu				# Virtualizer/emulator
+virt-manager			# VM managing GUI
+dnsmasq				# VM networking
+iptables-nft			# VM networking
+edk2-ovmf			# VM UEFI support
+
+# apps
+wireshark-qt			# Network monitor tool
+rxvt-unicode			# Terminal
+urxvt-perls			# Terminal extras
+urxvt-resize-font-git		# Terminal extras
+gimp				# GNU Image Manipulation Program
+viewnior			# Image viewer
+mpv				# Video player
+mupdf				# PDF viewer
+qalculate-gtk			# Calculator
+firefox				# Web browser
+chromium			# Web browser
+syncthing			# File synchronization
+discord				# Discord VoIP game chat
+spotify				# Music streaming (AUR)
+plex-media-player		# Video streaming desktop client (AUR)
+ventoy-bin			# Multiboot USB drive (AUR)
 
 # vim: set ts=8 sw=8 tw=0 noet :
