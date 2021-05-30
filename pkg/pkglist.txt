@@ -10,12 +10,17 @@ man-pages			# Linux man pages
 intel-ucode			# Intel Microcode
 lm_sensors			# Temp sensors
 sshfs				# Mount SSH drives
+zsh				# Z shell
+zsh-completions			# Zsh Additional completion
+zsh-syntax-highlighting		# Zsh syntax highlighting
+zsh-autosuggestions		# Zsh Fish like suggestions
 
 # Terminal apps
 neovim				# better VIM editor
 neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
 xxd-standalone			# VIMs hexdump (AUR)
 nano				# Fallback editor
+ripgrep				# Better, faster grep
 bat				# Cat with syntax highlighting
 lazygit				# Simple terminal UI for git commands
 mlocate				# locate/updatedb
