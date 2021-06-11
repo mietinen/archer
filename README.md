@@ -3,11 +3,11 @@
 Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 
 * /boot partition (400M)
-	* EFI/legacy support
+    * EFI/legacy support
 * root btrfs partition (Auto)
-	* @root, @home, @srv, @var, @swap subvolumes
-	* DBpath moved to /usr/lib/pacman for snapshot
-	* dm-crypt/LUKS support
+    * @root, @home, @srv, @var, @swap subvolumes
+    * DBpath moved to /usr/lib/pacman for snapshot
+    * dm-crypt/LUKS support
 * swap file (Auto/manual/none)
 
 Download script `curl -L https://git.io/JkPC9 -o archer.sh`
@@ -32,17 +32,17 @@ aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
 
 # pkglist.txt for extra packages (none will use pkglist.txt from local directory)
 pkglist=(
-	"https://raw.githubusercontent.com/mietinen/archer/master/pkg/pkglist.txt"
-	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/desktop.txt"
-	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/carbon.txt"
-	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/gaming.txt"
-	# "https://raw.githubusercontent.com/mietinen/archer/master/pkg/pentest.txt"
+    "https://raw.githubusercontent.com/mietinen/archer/master/pkg/pkglist.txt"
+    # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/desktop.txt"
+    # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/carbon.txt"
+    # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/gaming.txt"
+    # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/pentest.txt"
 )
 
 # Dotfiles git repo (blank for none)
 dotfilesrepo=(
-	"https://github.com/mietinen/shell.git"
-	# "https://github.com/mietinen/desktop.git"
+    "https://github.com/mietinen/shell.git"
+    # "https://github.com/mietinen/desktop.git"
 )
 ```
 

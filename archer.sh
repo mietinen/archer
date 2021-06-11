@@ -380,7 +380,7 @@ archer_aurinstall() {
         showresult
         if [ -n "$aurpackages" ] ; then
             printm 'Installing AUR packages (Failures can be checked out manually later)'
-            for aur in $aurpackages; do 
+            for aur in $aurpackages; do
                 sudo -u "$username" "$aurcmd" -S --noconfirm "$aur" >/dev/null 2>>error.txt || error=true
             done
             showresult
