@@ -1,9 +1,9 @@
 # Packages specific for my desktop gaming pc
 
-lib32-nvidia-utils		# Nvidia 32bit support
-nvidia				# Nvidia graphics
-nvtop				# Nvidia process viewer
-opencl-nvidia			# Nvidia OpenCL
-os-prober			# Windows detect for dual boot
+lib32-nvidia-utils              # Nvidia 32bit support
+nvidia                          # Nvidia graphics
+nvtop                           # Nvidia process viewer
+opencl-nvidia                   # Nvidia OpenCL
+os-prober                       # Windows detect for dual boot
 
-# vim: set ts=8 sw=8 tw=0 noet :
+# vim: set ts=4 sw=4 tw=0 et :

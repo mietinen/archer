@@ -1,43 +1,43 @@
 # Basic packages i want on all my systems
 
 # Basic stuff
-base-devel			# Building tools
-sudo				# sudo
-openssh				# SSH
-bash-completion			# Bash compilation
-snapper				# Btrfs snapshots tool
-man-pages			# Linux man pages
-intel-ucode			# Intel Microcode
-lm_sensors			# Temp sensors
-sshfs				# Mount SSH drives
-zsh				# Z shell
-zsh-completions			# Zsh Additional completion
-zsh-syntax-highlighting		# Zsh syntax highlighting
-zsh-autosuggestions		# Zsh Fish like suggestions
+base-devel                      # Building tools
+sudo                            # sudo
+openssh                         # SSH
+bash-completion                 # Bash compilation
+snapper                         # Btrfs snapshots tool
+man-pages                       # Linux man pages
+intel-ucode                     # Intel Microcode
+lm_sensors                      # Temp sensors
+sshfs                           # Mount SSH drives
+zsh                             # Z shell
+zsh-completions                 # Zsh Additional completion
+zsh-syntax-highlighting         # Zsh syntax highlighting
+zsh-autosuggestions             # Zsh Fish like suggestions
 
 # Terminal apps
-neovim				# better VIM editor
-neovim-symlinks			# Runs neovim if vi or vim is called (AUR)
-xxd-standalone			# VIMs hexdump (AUR)
-nano				# Fallback editor
-ripgrep				# Better, faster grep
-bat				# Cat with syntax highlighting
-lazygit				# Simple terminal UI for git commands
-mlocate				# locate/updatedb
-nnn				# Terminal file manager
-shellcheck-bin			# Check sh/bash scripts (AUR)
-weechat				# IRC client
-tmux				# Terminal multiplexer
-iperf3				# Network speed test
-ookla-speedtest-bin		# Speedtest.net CLI client (AUR)
-htop				# Process viewer
-pv				# Pipe viewer
-whois				# Domain lookup
-neofetch			# Terminal splash
-expac				# pacman database extraction utility
-reflector			# Pacman mirror update
-rsync				# Rsync
-unzip				# Zip archive
-unrar				# Rar archive
+neovim                          # better VIM editor
+neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
+xxd-standalone                  # VIMs hexdump (AUR)
+nano                            # Fallback editor
+ripgrep                         # Better, faster grep
+bat                             # Cat with syntax highlighting
+lazygit                         # Simple terminal UI for git commands
+mlocate                         # locate/updatedb
+nnn                             # Terminal file manager
+shellcheck-bin                  # Check sh/bash scripts (AUR)
+weechat                         # IRC client
+tmux                            # Terminal multiplexer
+iperf3                          # Network speed test
+ookla-speedtest-bin             # Speedtest.net CLI client (AUR)
+htop                            # Process viewer
+pv                              # Pipe viewer
+whois                           # Domain lookup
+neofetch                        # Terminal splash
+expac                           # pacman database extraction utility
+reflector                       # Pacman mirror update
+rsync                           # Rsync
+unzip                           # Zip archive
+unrar                           # Rar archive
 
-# vim: set ts=8 sw=8 tw=0 noet :
+# vim: set ts=4 sw=4 tw=0 et :

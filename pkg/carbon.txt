@@ -1,10 +1,13 @@
 # Packages specific for my X1 Carbon
 
-acpi_call			# 4G/LTE modem hack
-intel-media-driver		# Intel graphics
-modemmanager			# 4G/LTE modem manager
-sof-firmware			# Sound driver
-solaar				# Logitech mouse config
-xf86-video-intel		# Intel graphics
+acpi_call                       # 4G/LTE modem hack
+intel-media-driver              # Intel graphics
+modemmanager                    # 4G/LTE modem manager
+sof-firmware                    # Sound driver
+xf86-video-intel                # Intel graphics
+bluez-utils                     # Bluetooth
+blueman                         # GTK+ bluetooth manager
+upower                          # Battery status (bluetooth)
+auto-cpufreq                    # Longer battert life
 
-# vim: set ts=8 sw=8 tw=0 noet :
+# vim: set ts=4 sw=4 tw=0 et :
