@@ -294,6 +294,21 @@ archer_hostname() {
     showresult
 }
 
+
+# Createing crypt keyfile
+archer_cryptkeyfile() {
+    if [ "$encrypt" = true ] ; then
+        printm 'Createing crypt keyfile'
+        dd bs=512 count=4 if=/dev/random of=/boot/.root.keyfile iflag=fullblock \
+            2>>err.o || err=true
+        chmod 600 /boot/.root.keyfile \
+            2>>err.o || err=true
+        cryptsetup -q luksAddKey "$rootdev" /boot/.root.keyfile \
+            2>>err.o || err=true
+        showresult
+    fi
+}
+
 # Creating new initramfs
 archer_initramfs() {
     printm 'Creating new initramfs'
@@ -306,9 +321,12 @@ archer_initramfs() {
             >/dev/null 2>>err.o || err=true
         sed -i ':s;/^HOOKS=/s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;/^HOOKS=/s/  */ /g' /etc/mkinitcpio.conf \
             >/dev/null 2>>err.o || err=true
+        sed -i '/^FILES=/s/=()/=(\/boot\/.root.keyfile)/' /etc/mkinitcpio.conf \
+            >/dev/null 2>>err.o || err=true
     fi
     mkinitcpio -P \
         >/dev/null 2>>err.o || err=true
+    chmod 600 /boot/initramfs-linux* 2>>err.o || err=true
     showresult
 }
 
@@ -342,7 +360,7 @@ archer_bootloader() {
         >/dev/null 2>>err.o || err=true
     if [ "$encrypt" = true ] ; then
         rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
-        sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid:root"':allow-discards"/' /etc/default/grub \
+        sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='$rootid':root:allow-discards cryptkey=rootfs:\/boot\/.root.keyfile"/' /etc/default/grub \
             >/dev/null 2>>err.o || err=true
         sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub \
             >/dev/null 2>>err.o || err=true
@@ -652,6 +670,7 @@ else
     archer_locale
     archer_timezone
     archer_hostname
+    archer_cryptkeyfile
     archer_initramfs
     archer_pacconf
     archer_bootloader
