@@ -395,7 +395,7 @@ archer_etcconf() {
         2>>err.o || err=true
     # xorg.conf keyboard settings
     mkdir -p /etc/X11/xorg.conf.d/
-    tee /etc/X11/xorg.conf.d/00-keyboard.conf \
+    cat >/etc/X11/xorg.conf.d/00-keyboard.conf \
         2>>err.o || err=true <<EOF
 Section "InputClass"
     Identifier "system-keyboard"
