@@ -42,13 +42,20 @@ dotfilesrepo=(
 # -------------------
 #  No edit from here
 # -------------------
-
 if [ "${device::8}" == "/dev/nvm" ] ; then
-    bootdev="${device}p1"
-    rootdev="${device}p2"
+    if [ "$useefi" = true ] ; then
+        efidev="${device}p1"
+        rootdev="${device}p2"
+    else
+        rootdev="${device}p1"
+    fi
 else
-    bootdev="${device}1"
-    rootdev="${device}2"
+    if [ "$useefi" = true ] ; then
+        efidev="${device}1"
+        rootdev="${device}2"
+    else
+        rootdev="${device}1"
+    fi
 fi
 
 # Set size of swap file same as total memory if set as auto
@@ -90,8 +97,6 @@ archer_partition() {
     else
         parted -s "$device" mklabel msdos \
             >/dev/null 2>>err.o || err=true
-        echo -e "n\np\n\n\n+400M\na\nw" | fdisk "$device" \
-            >/dev/null 2>>err.o || err=true
         echo -e "n\np\n\n\n\nw" | fdisk "$device" \
             >/dev/null 2>>err.o || err=true
     fi
@@ -118,10 +123,7 @@ archer_encrypt() {
 archer_format() {
     printm 'Formating partitions'
     if [ "$useefi" = true ] ; then
-        mkfs.vfat "$bootdev" \
-            >/dev/null 2>>err.o || err=true
-    else
-        mkfs.ext4 "$bootdev" \
+        mkfs.vfat "$efidev" \
             >/dev/null 2>>err.o || err=true
     fi
     mkfs.btrfs -f "$mapper" \
@@ -179,8 +181,10 @@ archer_mount() {
         swapon /mnt/.swap/swapfile \
             >/dev/null 2>>err.o || err=true
     fi
-    mount "$bootdev" /mnt/efi \
-        >/dev/null 2>>err.o || err=true
+    if [ "$useefi" = true ] ; then
+        mount "$efidev" /mnt/efi \
+            >/dev/null 2>>err.o || err=true
+    fi
     showresult
 }
 
@@ -395,15 +399,13 @@ archer_etcconf() {
         2>>err.o || err=true
     # xorg.conf keyboard settings
     mkdir -p /etc/X11/xorg.conf.d/
-    cat >/etc/X11/xorg.conf.d/00-keyboard.conf \
-        2>>err.o || err=true <<EOF
-Section "InputClass"
+    printf 'Section "InputClass"
     Identifier "system-keyboard"
     MatchIsKeyboard "on"
-    Option "XkbLayout" "$keymap"
+    Option "XkbLayout" "%s"
     Option "XkbOptions" "nbsp:none"
-EndSection
-EOF
+EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf \
+        2>>err.o || err=true
     # .local hostname resolution
     if pacman -Q nss-mdns &>/dev/null ; then
         grep -e "hosts:.*mdns_minimal" /etc/nsswitch.conf &>/dev/null || \
@@ -642,7 +644,7 @@ if [ "$1" != "--chroot" ]; then
     archer_encrypt
     archer_format
     archer_mount
-    archer_reflector
+    # archer_reflector
     archer_pacstrap
     archer_pkgfetch
     archer_chroot
