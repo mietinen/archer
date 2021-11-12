@@ -109,9 +109,11 @@ archer_encrypt() {
     if [ "$encrypt" = true ] ; then
         printm 'Setting up encryption'
         echo
-        cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" \
+        cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" .root.keyfile \
             2>>err.o || err=true
-        cryptsetup -q open "$rootdev" root \
+        cryptsetup -q open "$rootdev" root --key-file .root.keyfile \
+            2>>err.o || err=true
+        cryptsetup -q luksAddKey "$rootdev" \
             2>>err.o || err=true
         mapper="/dev/mapper/root"
         printm 'Encryption setup'
@@ -237,6 +239,12 @@ archer_chroot() {
         >/dev/null 2>>err.o || err=true
     chmod 755 /mnt/root/archer.sh \
         >/dev/null 2>>err.o || err=true
+    if [ -r .root.keyfile ] ; then
+        mv .root.keyfile /mnt/boot/.root.keyfile \
+            >/dev/null 2>>err.o || err=true
+        chmod 600 /mnt/boot/.root.keyfile \
+            >/dev/null 2>>err.o || err=true
+    fi
     showresult
     arch-chroot /mnt /root/archer.sh --chroot
     rm -f /mnt/root/archer.sh \
@@ -292,21 +300,6 @@ archer_hostname() {
     printf "%-15s %-15s %-15s %-15s\n" "::1" "localhost" "ip6-localhost" "ip6-loopback" >> /etc/hosts
     printf "%-15s %-15s %-15s %-15s\n" "127.0.1.1" "$hostname" "${hostname}.home.arpa" >> /etc/hosts
     showresult
-}
-
-
-# Createing crypt keyfile
-archer_cryptkeyfile() {
-    if [ "$encrypt" = true ] ; then
-        printm 'Createing crypt keyfile'
-        dd bs=512 count=4 if=/dev/random of=/boot/.root.keyfile iflag=fullblock \
-            2>>err.o || err=true
-        chmod 600 /boot/.root.keyfile \
-            2>>err.o || err=true
-        cryptsetup -q luksAddKey "$rootdev" /boot/.root.keyfile \
-            2>>err.o || err=true
-        showresult
-    fi
 }
 
 # Creating new initramfs
@@ -670,7 +663,6 @@ else
     archer_locale
     archer_timezone
     archer_hostname
-    archer_cryptkeyfile
     archer_initramfs
     archer_pacconf
     archer_bootloader
