@@ -115,7 +115,7 @@ archer_encrypt() {
             2>>err.o || err=true
         cryptsetup -q open "$rootdev" root --key-file .root.keyfile \
             2>>err.o || err=true
-        cryptsetup -q luksAddKey "$rootdev" .root.keyfile \
+        cryptsetup -q luksAddKey "$rootdev" --key-file .root.keyfile \
             2>>err.o || err=true
         mapper="/dev/mapper/root"
         printm 'Encryption setup'
