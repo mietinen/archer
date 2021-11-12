@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Archer Archlinux install script
-# Setup with EFI/MBR bootloader (GRUB) at 200M /efi partition
+# Setup with EFI/MBR bootloader (GRUB) at 200M /boot/efi partition
 #               * btrfs root partition
 #                 * @root, @home, @srv, @var, @swap subvolumes
 #                 * Auto/manual/none swap file
@@ -157,7 +157,7 @@ archer_mount() {
     printm 'Mounting partitions'
     mount -o subvol=@root "$mapper" /mnt \
         >/dev/null 2>>err.o || err=true
-    mkdir -p /mnt/{efi,home,srv,var/cache,var/log,var/tmp} \
+    mkdir -p /mnt/{boot/efi,home,srv,var/cache,var/log,var/tmp} \
         >/dev/null 2>>err.o || err=true
     mount -o subvol=@home "$mapper" /mnt/home \
         >/dev/null 2>>err.o || err=true
@@ -186,7 +186,7 @@ archer_mount() {
             >/dev/null 2>>err.o || err=true
     fi
     if [ -d "/sys/firmware/efi" ] ; then
-        mount "$efidev" /mnt/efi \
+        mount "$efidev" /mnt/boot/efi \
             >/dev/null 2>>err.o || err=true
     fi
     showresult
@@ -363,7 +363,7 @@ archer_bootloader() {
     if [ -d "/sys/firmware/efi" ] ; then
         pacman --noconfirm --needed -S efibootmgr \
             >/dev/null 2>>err.o || err=true
-        grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck "$device" \
+        grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck "$device" \
             >/dev/null 2>>err.o || err=true
     else
         grub-install --target=i386-pc --recheck "$device" \
