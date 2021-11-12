@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Archer Archlinux install script
-# Setup with EFI/MBR bootloader (GRUB) at 400M /efi partition
+# Setup with EFI/MBR bootloader (GRUB) at 200M /efi partition
 #               * btrfs root partition
 #                 * @root, @home, @srv, @var, @swap subvolumes
 #                 * Auto/manual/none swap file
@@ -12,7 +12,6 @@
 hostname="archer"       # Machine hostname
 username="mietinen"     # Main user
 device="/dev/nvme0n1"   # Drive for install (/dev/nvme0n1, /dev/sda, etc)
-useefi=true             # Use EFI boot (true/false)
 language="en_GB"        # Language for locale.conf
 locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
@@ -42,15 +41,16 @@ dotfilesrepo=(
 # -------------------
 #  No edit from here
 # -------------------
+
 if [ "${device::8}" == "/dev/nvm" ] ; then
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         efidev="${device}p1"
         rootdev="${device}p2"
     else
         rootdev="${device}p1"
     fi
 else
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         efidev="${device}1"
         rootdev="${device}2"
     else
@@ -87,10 +87,10 @@ archer_keyclock() {
 # Setting up partitions
 archer_partition() {
     printm 'Setting up partitions'
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         parted -s "$device" mklabel gpt \
             >/dev/null 2>>err.o || err=true
-        sgdisk "$device" -n=1:0:+400M -t=1:ef00 \
+        sgdisk "$device" -n=1:0:+200M -t=1:ef00 \
             >/dev/null 2>>err.o || err=true
         sgdisk "$device" -n=2:0:0 \
             >/dev/null 2>>err.o || err=true
@@ -122,7 +122,7 @@ archer_encrypt() {
 # Formating partitions
 archer_format() {
     printm 'Formating partitions'
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         mkfs.vfat "$efidev" \
             >/dev/null 2>>err.o || err=true
     fi
@@ -181,7 +181,7 @@ archer_mount() {
         swapon /mnt/.swap/swapfile \
             >/dev/null 2>>err.o || err=true
     fi
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         mount "$efidev" /mnt/efi \
             >/dev/null 2>>err.o || err=true
     fi
@@ -347,7 +347,7 @@ archer_bootloader() {
         sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub \
             >/dev/null 2>>err.o || err=true
     fi
-    if [ "$useefi" = true ] ; then
+    if [ -d "/sys/firmware/efi" ] ; then
         pacman --noconfirm --needed -S efibootmgr \
             >/dev/null 2>>err.o || err=true
         grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck "$device" \
