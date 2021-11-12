@@ -23,7 +23,6 @@ ufw                             # Uncomplicated Firewall
 
 # awesome wm
 awesome                         # window manager
-i3lock                          # i3 screen lock
 rofi                            # dmenu replacement
 lxsession                       # Polkit
 picom                           # Compositor for Xorg
@@ -32,7 +31,7 @@ nitrogen                        # Wallpaper tool
 arandr                          # Graphical xrandr front-end
 autorandr                       # Auto detect display, xrandr
 pavucontrol                     # PulseAudio GTK Volume Control
-xss-lock                        # Screen lock
+light-locker                    # Screen lock
 thunar                          # GTK+ file manager
 xarchiver                       # Thunar file archive support
 gnome-keyring                   # Password management
@@ -44,11 +43,11 @@ lightdm-gtk-greeter             # Display manager, logon screen
 
 # Theming
 gtk-engine-murrine              # GTK theme engine
-arc-gtk-theme                   # GTK theme
+gnome-themes-extra              # Adwaita GTK theme
 papirus-icon-theme              # Icon theme
 archlinux-wallpaper             # Wallpaper pack
-matcha-gtk-theme                # GTK theme (AUR)
-gnome-themes-extra              # Adwaita GTK theme
+gruvbox-material-gtk-theme-git  # GTK theme (AUR)
+gruvbox-material-icon-theme-git # Icon theme (AUR)
 qt5-styleplugins                # Qt GTK theme support (AUR)
 
 # Utility
@@ -81,9 +80,7 @@ edk2-ovmf                       # VM UEFI support
 
 # apps
 wireshark-qt                    # Network monitor tool
-rxvt-unicode                    # Terminal
-urxvt-perls                     # Terminal extras
-urxvt-resize-font-git           # Terminal extras
+alacritty                       # Terminal
 gimp                            # GNU Image Manipulation Program
 viewnior                        # Image viewer
 mpv                             # Video player
@@ -96,5 +93,6 @@ discord                         # Discord VoIP game chat
 spotify                         # Music streaming (AUR)
 plex-media-player               # Video streaming desktop client (AUR)
 ventoy-bin                      # Multiboot USB drive (AUR)
+zola                            # Zola static site engine
 
 # vim: set ts=4 sw=4 tw=0 et :
