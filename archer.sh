@@ -109,11 +109,13 @@ archer_encrypt() {
     if [ "$encrypt" = true ] ; then
         printm 'Setting up encryption'
         echo
+        dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock \
+            2>>err.o || err=true
         cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" .root.keyfile \
             2>>err.o || err=true
         cryptsetup -q open "$rootdev" root --key-file .root.keyfile \
             2>>err.o || err=true
-        cryptsetup -q luksAddKey "$rootdev" \
+        cryptsetup -q luksAddKey "$rootdev" .root.keyfile \
             2>>err.o || err=true
         mapper="/dev/mapper/root"
         printm 'Encryption setup'
