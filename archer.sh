@@ -38,10 +38,12 @@ dotfilesrepo=(
 )
 
 
-# -------------------
-#  No edit from here
-# -------------------
+# ------------------------------------------------------------------------------
+# End of settings
+# No need edit from here
+# ------------------------------------------------------------------------------
 
+# EFI and root file system devices
 if [ "${device::8}" == "/dev/nvm" ] ; then
     if [ -d "/sys/firmware/efi" ] ; then
         efidev="${device}p1"
@@ -77,10 +79,8 @@ archer_check() {
 # Setting up keyboard and clock
 archer_keyclock() {
     printm 'Setting up keyboard and clock'
-    loadkeys "$keymap" \
-        >/dev/null 2>>err.o || err=true
-    timedatectl set-ntp true \
-        >/dev/null 2>>err.o || err=true
+    _s loadkeys "$keymap"
+    _s timedatectl set-ntp true
     showresult
 }
 
@@ -88,17 +88,12 @@ archer_keyclock() {
 archer_partition() {
     printm 'Setting up partitions'
     if [ -d "/sys/firmware/efi" ] ; then
-        parted -s "$device" mklabel gpt \
-            >/dev/null 2>>err.o || err=true
-        sgdisk "$device" -n=1:0:+200M -t=1:ef00 \
-            >/dev/null 2>>err.o || err=true
-        sgdisk "$device" -n=2:0:0 \
-            >/dev/null 2>>err.o || err=true
+        _s parted -s "$device" mklabel gpt
+        _s sgdisk "$device" -n=1:0:+200M -t=1:ef00
+        _s sgdisk "$device" -n=2:0:0
     else
-        parted -s "$device" mklabel msdos \
-            >/dev/null 2>>err.o || err=true
-        echo -e "n\np\n\n\n\nw" | fdisk "$device" \
-            >/dev/null 2>>err.o || err=true
+        _s parted -s "$device" mklabel msdos
+        _s echo -e "n\np\n\n\n\nw" | fdisk "$device"
     fi
     showresult
 }
@@ -109,14 +104,10 @@ archer_encrypt() {
     if [ "$encrypt" = true ] ; then
         printm 'Setting up encryption'
         echo
-        dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock \
-            2>>err.o || err=true
-        cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" .root.keyfile \
-            2>>err.o || err=true
-        cryptsetup -q open "$rootdev" root --key-file .root.keyfile \
-            2>>err.o || err=true
-        cryptsetup -q luksAddKey "$rootdev" --key-file .root.keyfile \
-            2>>err.o || err=true
+        _s dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock
+        _e cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" .root.keyfile
+        _e cryptsetup -q open "$rootdev" root --key-file .root.keyfile
+        _e cryptsetup -q luksAddKey "$rootdev" --key-file .root.keyfile
         mapper="/dev/mapper/root"
         printm 'Encryption setup'
         showresult
@@ -127,67 +118,44 @@ archer_encrypt() {
 archer_format() {
     printm 'Formating partitions'
     if [ -d "/sys/firmware/efi" ] ; then
-        mkfs.vfat "$efidev" \
-            >/dev/null 2>>err.o || err=true
+        _s mkfs.vfat "$efidev"
     fi
-    mkfs.btrfs -f "$mapper" \
-        >/dev/null 2>>err.o || err=true
+    _s mkfs.btrfs -f "$mapper"
 
-    mount "$mapper" /mnt \
-        >/dev/null 2>>err.o || err=true
-    btrfs subvolume create /mnt/@root \
-        >/dev/null 2>>err.o || err=true
-    btrfs subvolume create /mnt/@home \
-        >/dev/null 2>>err.o || err=true
-    btrfs subvolume create /mnt/@srv \
-        >/dev/null 2>>err.o || err=true
-    btrfs subvolume create /mnt/@var \
-        >/dev/null 2>>err.o || err=true
+    _s mount "$mapper" /mnt
+    _s btrfs subvolume create /mnt/@root
+    _s btrfs subvolume create /mnt/@home
+    _s btrfs subvolume create /mnt/@srv
+    _s btrfs subvolume create /mnt/@var
     if [ "$swapsize" != "0" ] ; then
-        btrfs subvolume create /mnt/@swap \
-            >/dev/null 2>>err.o || err=true
+        _s btrfs subvolume create /mnt/@swap
     fi
-    umount /mnt \
-        >/dev/null 2>>err.o || err=true
+    _s umount /mnt
     showresult
 }
 
 # Mounting partitions
 archer_mount() {
     printm 'Mounting partitions'
-    mount -o subvol=@root "$mapper" /mnt \
-        >/dev/null 2>>err.o || err=true
-    mkdir -p /mnt/{boot/efi,home,srv,var/cache,var/log,var/tmp} \
-        >/dev/null 2>>err.o || err=true
-    mount -o subvol=@home "$mapper" /mnt/home \
-        >/dev/null 2>>err.o || err=true
-    mount -o subvol=@srv "$mapper" /mnt/srv \
-        >/dev/null 2>>err.o || err=true
-    mount -o nodatacow,subvol=@var "$mapper" /mnt/var \
-        >/dev/null 2>>err.o || err=true
+    _s mount -o subvol=@root "$mapper" /mnt
+    _s mkdir -p /mnt/{home,srv,var}
+    _s mount -o subvol=@home "$mapper" /mnt/home
+    _s mount -o subvol=@srv "$mapper" /mnt/srv
+    _s mount -o nodatacow,subvol=@var "$mapper" /mnt/var
     if [ "$swapsize" != "0" ] ; then
-        mkdir -p /mnt/.swap \
-            >/dev/null 2>>err.o || err=true
-        mount -o nodatacow,subvol=@swap "$mapper" /mnt/.swap \
-            >/dev/null 2>>err.o || err=true
-        truncate -s 0 /mnt/.swap/swapfile \
-            >/dev/null 2>>err.o || err=true
-        chattr +C /mnt/.swap/swapfile \
-            >/dev/null 2>>err.o || err=true
-        btrfs property set /mnt/.swap/swapfile compression none \
-            >/dev/null 2>>err.o || err=true
-        dd if=/dev/zero of=/mnt/.swap/swapfile bs=1M count="$swapsize" \
-            >/dev/null 2>>err.o || err=true
-        chmod 600 /mnt/.swap/swapfile \
-            >/dev/null 2>>err.o || err=true
-        mkswap /mnt/.swap/swapfile \
-            >/dev/null 2>>err.o || err=true
-        swapon /mnt/.swap/swapfile \
-            >/dev/null 2>>err.o || err=true
+        _s mkdir -p /mnt/.swap
+        _s mount -o nodatacow,subvol=@swap "$mapper" /mnt/.swap
+        _s truncate -s 0 /mnt/.swap/swapfile
+        _s chattr +C /mnt/.swap/swapfile
+        _s btrfs property set /mnt/.swap/swapfile compression none
+        _s dd if=/dev/zero of=/mnt/.swap/swapfile bs=1M count="$swapsize"
+        _s chmod 600 /mnt/.swap/swapfile
+        _s mkswap /mnt/.swap/swapfile
+        _s swapon /mnt/.swap/swapfile
     fi
     if [ -d "/sys/firmware/efi" ] ; then
-        mount "$efidev" /mnt/boot/efi \
-            >/dev/null 2>>err.o || err=true
+        _s mkdir -p /mnt/boot/efi
+        _s mount "$efidev" /mnt/boot/efi
     fi
     showresult
 }
@@ -195,20 +163,16 @@ archer_mount() {
 # Installing and running reflector to generate mirrorlist
 archer_reflector() {
     printm 'Installing and running reflector to generate mirrorlist'
-    pacman --noconfirm -Sy reflector \
-        >/dev/null 2>>err.o || err=true
-    reflector -l 50 -p http,https --sort rate --save /etc/pacman.d/mirrorlist \
-        >/dev/null 2>>err.o || err=true
+    _s pacman --noconfirm --needed -Sy reflector
+    _s reflector -a 48 --score 50 --sort score --save /etc/pacman.d/mirrorlist
     showresult
 }
 
 # Installing base to disk
 archer_pacstrap() {
     printm 'Installing base to disk'
-    pacstrap /mnt base linux linux-firmware btrfs-progs sudo \
-        >/dev/null 2>>err.o || err=true
-    genfstab -U /mnt >> /mnt/etc/fstab \
-        2>>err.o || err=true
+    _s pacstrap /mnt base linux linux-firmware btrfs-progs sudo
+    _e genfstab -U /mnt >> /mnt/etc/fstab
     showresult
 }
 
@@ -217,18 +181,16 @@ archer_pkgfetch() {
     if [ ${#pkglist[@]} -gt 0 ] ; then
         printm 'Downloading pkglist.txt'
         for pkg in "${pkglist[@]}" ; do
-            echo "# $pkg" >>/mnt/root/pkglist.txt
-            curl -sL "$pkg" >>/mnt/root/pkglist.txt \
-                2>>err.o || err=true
-            echo >>/mnt/root/pkglist.txt
+            _e echo "# $pkg" >>/mnt/root/pkglist.txt
+            _e curl -sL "$pkg" >>/mnt/root/pkglist.txt
+            _e echo >>/mnt/root/pkglist.txt
         done
         showresult
     fi
 
     if [ ! -r "/mnt/root/pkglist.txt" ] && [ -r "pkglist.txt" ] ; then
         printm 'Copying pkglist.txt'
-        cp pkglist.txt /mnt/root/pkglist.txt \
-            >/dev/null 2>>err.o || err=true
+        _s cp pkglist.txt /mnt/root/pkglist.txt
         showresult
     fi
 }
@@ -237,15 +199,11 @@ archer_pkgfetch() {
 # Cleaning up files in /mnt/root
 archer_chroot() {
     printm 'Running arch-chroot'
-    cp "$0" /mnt/root/archer.sh \
-        >/dev/null 2>>err.o || err=true
-    chmod 755 /mnt/root/archer.sh \
-        >/dev/null 2>>err.o || err=true
+    _s cp "$0" /mnt/root/archer.sh
+    _s chmod 755 /mnt/root/archer.sh
     if [ -r .root.keyfile ] ; then
-        mv .root.keyfile /mnt/boot/.root.keyfile \
-            >/dev/null 2>>err.o || err=true
-        chmod 600 /mnt/boot/.root.keyfile \
-            >/dev/null 2>>err.o || err=true
+        _s mv .root.keyfile /mnt/boot/.root.keyfile
+        _s chmod 600 /mnt/boot/.root.keyfile
     fi
     showresult
     arch-chroot /mnt /root/archer.sh --chroot
@@ -259,118 +217,92 @@ archer_chroot() {
 # Setting up locale and keyboard
 archer_locale() {
     printm 'Setting up locale and keyboard'
-    sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen \
-        >/dev/null 2>>err.o || err=true
-    sed -i '/^#'$language'/s/^#//g' /etc/locale.gen \
-        >/dev/null 2>>err.o || err=true
-    sed -i '/^#en_US/s/^#//g' /etc/locale.gen \
-        >/dev/null 2>>err.o || err=true
-    locale-gen \
-        >/dev/null 2>>err.o || err=true
-    printf "KEYMAP=%s\n" "$keymap" > /etc/vconsole.conf
-    printf "LANG=%s.UTF-8\n" "$language" > /etc/locale.conf
-    printf "LC_COLLATE=C\n" >> /etc/locale.conf
-    printf "LC_ADDRESS=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_CTYPE=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    printf "LC_IDENTIFICATION=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    printf "LC_MEASUREMENT=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_MESSAGES=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    printf "LC_MONETARY=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_NAME=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    printf "LC_NUMERIC=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_PAPER=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_TELEPHONE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    printf "LC_TIME=%s.UTF-8\n" "$language" >> /etc/locale.conf
+    _s sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen
+    _s sed -i '/^#'$language'/s/^#//g' /etc/locale.gen
+    _s sed -i '/^#en_US/s/^#//g' /etc/locale.gen
+    _s locale-gen
+    _e printf "KEYMAP=%s\n" "$keymap" > /etc/vconsole.conf
+    _e printf "LANG=%s.UTF-8\n" "$language" > /etc/locale.conf
+    _e printf "LC_COLLATE=C\n" >> /etc/locale.conf
+    _e printf "LC_ADDRESS=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_CTYPE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_IDENTIFICATION=%s.UTF-8\n" "$language" >> /etc/locale.conf
+    _e printf "LC_MEASUREMENT=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_MESSAGES=%s.UTF-8\n" "$language" >> /etc/locale.conf
+    _e printf "LC_MONETARY=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_NAME=%s.UTF-8\n" "$language" >> /etc/locale.conf
+    _e printf "LC_NUMERIC=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_PAPER=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_TELEPHONE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
+    _e printf "LC_TIME=%s.UTF-8\n" "$language" >> /etc/locale.conf
     showresult
 }
 
 # Setting timezone and adjtime
 archer_timezone() {
     printm 'Setting timezone and adjtime'
-    ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime \
-        >/dev/null 2>>err.o || err=true
-    hwclock --systohc \
-        >/dev/null 2>>err.o || err=true
+    _s ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime
+    _s hwclock --systohc
     showresult
 }
 
 # Setting hostname
 archer_hostname() {
     printm 'Setting hostname'
-    printf "%s\n" "$hostname" > /etc/hostname
-    printf "%-15s %s\n" "127.0.0.1" "localhost" > /etc/hosts
-    printf "%-15s %-15s %-15s %-15s\n" "::1" "localhost" "ip6-localhost" "ip6-loopback" >> /etc/hosts
-    printf "%-15s %-15s %-15s %-15s\n" "127.0.1.1" "$hostname" "${hostname}.home.arpa" >> /etc/hosts
+    _e printf "%s\n" "$hostname" > /etc/hostname
+    _e printf "%-15s %s\n" "127.0.0.1" "localhost" > /etc/hosts
+    _e printf "%-15s %-15s %-15s %-15s\n" "::1" "localhost" "ip6-localhost" "ip6-loopback" >> /etc/hosts
+    _e printf "%-15s %-15s %-15s %-15s\n" "127.0.1.1" "$hostname" "${hostname}.home.arpa" >> /etc/hosts
     showresult
 }
 
 # Creating new initramfs
 archer_initramfs() {
     printm 'Creating new initramfs'
-    sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf \
-        >/dev/null 2>>err.o || err=true
+    _s sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf
     if [ "$encrypt" = true ] ; then
-        sed -i '/^HOOKS=/s/\(filesystems\)/encrypt \1/' /etc/mkinitcpio.conf \
-            >/dev/null 2>>err.o || err=true
-        sed -i '/^HOOKS=/s/\(autodetect\)/keyboard keymap \1/' /etc/mkinitcpio.conf \
-            >/dev/null 2>>err.o || err=true
-        sed -i ':s;/^HOOKS=/s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;/^HOOKS=/s/  */ /g' /etc/mkinitcpio.conf \
-            >/dev/null 2>>err.o || err=true
-        sed -i '/^FILES=/s/=()/=(\/boot\/.root.keyfile)/' /etc/mkinitcpio.conf \
-            >/dev/null 2>>err.o || err=true
+        _s sed -i '/^HOOKS=/s/\(filesystems\)/encrypt \1/' /etc/mkinitcpio.conf
+        _s sed -i '/^HOOKS=/s/\(autodetect\)/keyboard keymap \1/' /etc/mkinitcpio.conf
+        _s sed -i ':s;/^HOOKS=/s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;/^HOOKS=/s/  */ /g' /etc/mkinitcpio.conf
+        _s sed -i '/^FILES=/s/=()/=(\/boot\/.root.keyfile)/' /etc/mkinitcpio.conf
     fi
-    mkinitcpio -P \
-        >/dev/null 2>>err.o || err=true
-    chmod 600 /boot/initramfs-linux* 2>>err.o || err=true
+    _s mkinitcpio -P
+    _s chmod 600 /boot/initramfs-linux*
     showresult
 }
 
 # Changes to pacman.conf and makepkg.conf
 archer_pacconf() {
     printm 'Changes to pacman.conf and makepkg.conf'
-    sed -i "s/^#\(Color\)/\1/" /etc/pacman.conf \
-        >/dev/null 2>>err.o || err=true
-    sed -i "s/^#\(ParallelDownloads\)/\1/" /etc/pacman.conf \
-        >/dev/null 2>>err.o || err=true
-    sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf \
-        >/dev/null 2>>err.o || err=true
+    _s sed -i "s/^#\(Color\)/\1/" /etc/pacman.conf
+    _s sed -i "s/^#\(ParallelDownloads\)/\1/" /etc/pacman.conf
+    _s sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
     if [ "$multilib" = true ] ; then
-        sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf \
-            >/dev/null 2>>err.o || err=true
+        _s sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
     fi
     # Move DBpath out of /var, to make it a part of @root snapshots
-    mv /var/lib/pacman/ /usr/lib/pacman/ \
-        2>>err.o || err=true
-    ln -sf ../../usr/lib/pacman/ /var/lib/pacman \
-        2>>err.o || err=true
-    sed -i 's/^#\?\(DBPath\s\+=\).\+/\1 \/usr\/lib\/pacman\//' /etc/pacman.conf \
-        >/dev/null 2>>err.o || err=true
+    _s mv /var/lib/pacman/ /usr/lib/pacman/
+    _s ln -sf ../../usr/lib/pacman/ /var/lib/pacman
+    _s sed -i 's/^#\?\(DBPath\s\+=\).\+/\1 \/usr\/lib\/pacman\//' /etc/pacman.conf
     showresult
 }
 
 # Installing bootloader
 archer_bootloader() {
     printm 'Installing bootloader'
-    pacman --noconfirm --needed -Sy grub grub-btrfs \
-        >/dev/null 2>>err.o || err=true
+    _s pacman --noconfirm --needed -Sy grub grub-btrfs
     if [ "$encrypt" = true ] ; then
         rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
-        sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='$rootid':root:allow-discards cryptkey=rootfs:\/boot\/.root.keyfile"/' /etc/default/grub \
-            >/dev/null 2>>err.o || err=true
-        sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub \
-            >/dev/null 2>>err.o || err=true
+        _s sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid"':root:allow-discards cryptkey=rootfs:\/boot\/.root.keyfile"/' /etc/default/grub
+        _s sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub
     fi
     if [ -d "/sys/firmware/efi" ] ; then
-        pacman --noconfirm --needed -S efibootmgr \
-            >/dev/null 2>>err.o || err=true
-        grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck "$device" \
-            >/dev/null 2>>err.o || err=true
+        _s pacman --noconfirm --needed -S efibootmgr
+        _s grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck "$device"
     else
-        grub-install --target=i386-pc --recheck "$device" \
-            >/dev/null 2>>err.o || err=true
+        _s grub-install --target=i386-pc --recheck "$device"
     fi
-    grub-mkconfig -o /boot/grub/grub.cfg \
-        >/dev/null 2>>err.o || err=true
+    _s grub-mkconfig -o /boot/grub/grub.cfg
     showresult
 }
 
@@ -378,14 +310,10 @@ archer_bootloader() {
 archer_readpkg() {
     if [ -f /root/pkglist.txt ] ; then
         printm 'Reading packages from pkglist.txt'
-        reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" \
-            || err=true
-        pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//;/^[[:space:]]*$/d' | sort -u 2>>err.o)" \
-            || err=true
-        packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) \
-            || err=true
-        aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) \
-            || err=true
+        reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
+        pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//;/^[[:space:]]*$/d' | sort -u 2>>err.o)" || err=true
+        packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
+        aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
         showresult
     fi
 }
@@ -395,8 +323,7 @@ archer_pacinstall() {
     if [ -n "$packages" ] ; then
         printm 'Installing extra packages'
         # --ask 4: ALPM_QUESTION_CONFLICT_PKG = (1 << 2)
-        pacman --noconfirm --needed --ask 4 -S $packages \
-            >/dev/null 2>>err.o || err=true
+        _s pacman --noconfirm --needed --ask 4 -S $packages
         showresult
     fi
 }
@@ -405,30 +332,25 @@ archer_pacinstall() {
 archer_etcconf() {
     printm 'Editing som /etc files'
     # nano syntax highlighting
-    [ -f "/etc/nanorc" ] && sed -i '/^# include / s/^# //' /etc/nanorc \
-        >/dev/null 2>>err.o || err=true
+    [ -f "/etc/nanorc" ] && _s sed -i '/^# include / s/^# //' /etc/nanorc
     # Disable internal speaker
-    echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf \
-        2>>err.o || err=true
+    _e echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
     # xorg.conf keyboard settings
     mkdir -p /etc/X11/xorg.conf.d/
-    printf 'Section "InputClass"
+    _e printf 'Section "InputClass"
     Identifier "system-keyboard"
     MatchIsKeyboard "on"
     Option "XkbLayout" "%s"
     Option "XkbOptions" "nbsp:none"
-EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf \
-        2>>err.o || err=true
+EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf
     # .local hostname resolution
     if pacman -Q nss-mdns &>/dev/null ; then
         grep -e "hosts:.*mdns_minimal" /etc/nsswitch.conf &>/dev/null || \
-            sed -i '/^hosts:/s/\(resolve\|dns\)/mdns_minimal \[NOTFOUND=return\] \1/' /etc/nsswitch.conf \
-            >/dev/null 2>>err.o || err=true
+            _s sed -i '/^hosts:/s/\(resolve\|dns\)/mdns_minimal \[NOTFOUND=return\] \1/' /etc/nsswitch.conf
     fi
     if pacman -Q mlocate &>/dev/null ; then
         grep -e "PRUNENAMES.*\.snapshots" /etc/updatedb.conf &>/dev/null || \
-            sed -i '/^PRUNENAMES/s/"\(.*\)"/"\1 .snapshots"/' /etc/updatedb.conf \
-            >/dev/null 2>>err.o || err=true
+            _s sed -i '/^PRUNENAMES/s/"\(.*\)"/"\1 .snapshots"/' /etc/updatedb.conf
     fi
     showresult
 }
@@ -437,24 +359,18 @@ EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf \
 archer_user() {
     printm 'Adding user and setting password'
     mkdir -p /etc/sudoers.d/
-    chmod 750 /etc/sudoers.d/ \
-        2>>err.o || err=true
-    echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root \
-        2>>err.o || err=true
-    echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel \
-        2>>err.o || err=true
+    _s chmod 750 /etc/sudoers.d/
+    _e echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
+    _e echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
     # removed later
     echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
-    useradd -m -G wheel -s /bin/bash "$username" \
-        >/dev/null 2>>err.o || err=true
+    _s useradd -m -G wheel -s /bin/bash "$username"
     # Other groups
     if pacman -Q libvirt &>/dev/null ; then
-        usermod -aG libvirt "$username" \
-            >/dev/null 2>>err.o || err=true
+        _s usermod -aG libvirt "$username"
     fi
     if pacman -Q wireshark-cli &>/dev/null ; then
-        usermod -aG wireshark "$username" \
-            >/dev/null 2>>err.o || err=true
+        _s usermod -aG wireshark "$username"
     fi
     showresult
     passwd "$username"
@@ -466,22 +382,16 @@ archer_aurinstall() {
         aurcmd="$(echo "$aurhelper" | sed -r 's/-(bin|git)//g')"
         # Installing AUR helper
         printm "Installing AUR helper ($aurhelper)"
-        pacman --noconfirm --needed -S base-devel git \
-            >/dev/null 2>>err.o || err=true
-        cd /tmp \
-            >/dev/null 2>>err.o || err=true
-        sudo -u "$username" git clone "https://aur.archlinux.org/$aurhelper.git" \
-            >/dev/null 2>>err.o || err=true
-        cd "$aurhelper" \
-            >/dev/null 2>>err.o || err=true
-        sudo -u "$username" makepkg --noconfirm -si \
-            >/dev/null 2>>err.o || err=true
+        _s pacman --noconfirm --needed -S base-devel git
+        _s cd /tmp
+        _s sudo -u "$username" git clone "https://aur.archlinux.org/$aurhelper.git"
+        _s cd "$aurhelper"
+        _s sudo -u "$username" makepkg --noconfirm -si
         showresult
         if [ -n "$aurpackages" ] ; then
             printm 'Installing AUR packages (Failures can be checked out manually later)'
             for aur in $aurpackages; do
-                sudo -u "$username" "$aurcmd" -S --noconfirm "$aur" \
-                    >/dev/null 2>>err.o || err=true
+                _s sudo -u "$username" "$aurcmd" -S --noconfirm "$aur"
             done
             showresult
         fi
@@ -492,18 +402,13 @@ archer_aurinstall() {
 archer_dotfiles() {
     if [ ${#dotfilesrepo[@]} -gt 0 ] ; then
         printm 'Installing dotfiles from git repo'
-        pacman --noconfirm --needed -S git \
-            >/dev/null 2>>err.o || err=true
+        _s pacman --noconfirm --needed -S git
         for repo in "${dotfilesrepo[@]}" ; do
-            tempdir=$(mktemp -d) \
-                >/dev/null 2>>err.o || err=true
-            chown -R "$username:$username" "$tempdir" \
-                >/dev/null 2>>err.o || err=true
-            sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles" \
-                >/dev/null 2>>err.o || err=true
-            rm -rf "$tempdir/dotfiles/.git"
-            sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username" \
-                >/dev/null 2>>err.o || err=true
+            tempdir="$(mktemp -d)" || err=true
+            _s chown -R "$username:$username" "$tempdir"
+            _s sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles"
+            _s rm -rf "$tempdir/dotfiles/.git"
+            _s sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username"
         done
         showresult
     fi
@@ -514,22 +419,17 @@ archer_services() {
     printm 'Enabeling services (Created symlink "errors" can be ignored)'
     # Services: network manager
     if pacman -Q networkmanager &>/dev/null ; then
-        systemctl enable NetworkManager.service \
-            >/dev/null 2>>err.o || err=true
-        systemctl enable NetworkManager-wait-online.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable NetworkManager.service
+        _s systemctl enable NetworkManager-wait-online.service
 
     elif pacman -Q connman &>/dev/null ; then
-        systemctl enable connman.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable connman.service
 
     elif pacman -Q wicd &>/dev/null ; then
-        systemctl enable wicd.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable wicd.service
 
     elif pacman -Q dhcpcd &>/dev/null ; then
-        systemctl enable dhcpcd.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable dhcpcd.service
 
     else
         eth="$(basename /sys/class/net/en*)"
@@ -540,93 +440,75 @@ archer_services() {
         [ -d "/sys/class/net/$wifi" ] && \
             printf "[Match]\nName=%s\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=20" "$wifi" \
             > /etc/systemd/network/25-wireless.network
-        systemctl enable systemd-networkd.service \
-            >/dev/null 2>>err.o || err=true
-        systemctl enable systemd-networkd-wait-online.service \
-            >/dev/null 2>>err.o || err=true
-        systemctl enable systemd-resolved.service \
-            >/dev/null 2>>err.o || err=true
-        umount /etc/resolv.conf \
-            2>/dev/null
-        ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf \
-            2>>err.o || err=true
+        _s systemctl enable systemd-networkd.service
+        _s systemctl enable systemd-networkd-wait-online.service
+        _s systemctl enable systemd-resolved.service
+        umount /etc/resolv.conf 2>/dev/null
+        _s ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
     fi
 
     # Services: display manager
     if pacman -Q lightdm &>/dev/null ; then
-        systemctl enable lightdm.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable lightdm.service
 
     elif pacman -Q lxdm &>/dev/null ; then
-        systemctl enable lxdm.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable lxdm.service
 
     elif pacman -Q gdm &>/dev/null ; then
-        systemctl enable gdm.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable gdm.service
 
     elif pacman -Q sddm &>/dev/null ; then
-        systemctl enable sddm.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable sddm.service
 
     elif pacman -Q xorg-xdm &>/dev/null ; then
-        systemctl enable xdm.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable xdm.service
 
     elif pacman -Qs entrance &>/dev/null ; then
-        systemctl enable entrance.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable entrance.service
     fi
 
     # Services: other
     if pacman -Q util-linux &>/dev/null ; then
-        systemctl enable fstrim.timer \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable fstrim.timer
     fi
 
     if pacman -Q bluez &>/dev/null ; then
-        systemctl enable bluetooth.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable bluetooth.service
     fi
 
     if pacman -Q modemmanager &>/dev/null ; then
-        systemctl enable ModemManager.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable ModemManager.service
     fi
 
     if pacman -Q ufw &>/dev/null ; then
-        systemctl enable ufw.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable ufw.service
     fi
 
     if pacman -Q libvirt &>/dev/null ; then
-        systemctl enable libvirtd.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable libvirtd.service
     fi
 
     if pacman -Q avahi &>/dev/null ; then
-        systemctl enable avahi-daemon.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable avahi-daemon.service
     fi
 
     if pacman -Q cups &>/dev/null ; then
-        systemctl enable cups.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable cups.service
     fi
 
     if pacman -Q autorandr &>/dev/null ; then
-        systemctl enable autorandr.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable autorandr.service
     fi
 
     if pacman -Q auto-cpufreq &>/dev/null ; then
-        systemctl enable auto-cpufreq.service \
-            >/dev/null 2>>err.o || err=true
+        _s systemctl enable auto-cpufreq.service
     fi
     showresult
 }
 
-
+# Short function to silent command outputs
+_s() { "$@" >/dev/null 2>>err.o || err=true; }
+_e() { "$@" 2>>err.o || err=true; }
 
 # Printing OK/ERROR
 showresult() {
@@ -642,13 +524,13 @@ showresult() {
     rm -f err.o
     unset err
 }
+
 # Padding
 width=$(($(tput cols)-15))
 padding=$(printf '.%.0s' {1..500})
 printm() {
     printf "%-${width}.${width}s" "$1 $padding"
 }
-
 
 if [ "$1" != "--chroot" ]; then
     archer_check
