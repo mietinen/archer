@@ -81,20 +81,21 @@ iptables-nft                    # VM networking
 edk2-ovmf                       # VM UEFI support
 
 # apps
-wireshark-qt                    # Network monitor tool
 alacritty                       # Terminal
-gimp                            # GNU Image Manipulation Program
-viewnior                        # Image viewer
-mpv                             # Video player
-mupdf                           # PDF viewer
 qalculate-gtk                   # Calculator
 firefox                         # Web browser
 chromium                        # Web browser
 syncthing                       # File synchronization
-discord                         # Discord VoIP game chat
 spotify                         # Music streaming (AUR)
 plex-media-player               # Video streaming desktop client (AUR)
+viewnior                        # Image viewer
+mpv                             # Video player
+mupdf                           # PDF viewer
+libreoffice-fresh               # LibreOffice
+gimp                            # GNU Image Manipulation Program
+discord                         # Discord VoIP game chat
 ventoy-bin                      # Multiboot USB drive (AUR)
-zola                            # Zola static site engine
+wireshark-qt                    # Network monitor tool
+icaclient                       # Citrix receiver (AUR)
 
 # vim: set ts=4 sw=4 tw=0 et :

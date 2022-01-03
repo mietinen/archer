@@ -1,0 +1,13 @@
+# Development tools
+
+android-tools                   # Android platform tools
+bash-language-server            # Bash language server
+go                              # Go programming language
+gopls                           # Go language server
+rust                            # Rust programming language
+rust-analyzer                   # Rust language server
+pyright                         # Python language server
+lua-language-server             # Lua language server
+zola                            # Zola static site engine
+
+# vim: set ts=4 sw=4 tw=0 et :

@@ -27,7 +27,9 @@ fzy                             # A better fuzzy finder
 bat                             # Cat with syntax highlighting
 lazygit                         # Simple terminal UI for git commands
 mlocate                         # locate/updatedb
+tree                            # tree
 nnn                             # Terminal file manager
+trash-cli                       # Trash cli, for nnn
 shellcheck-bin                  # Check sh/bash scripts (AUR)
 weechat                         # IRC client
 tmux                            # Terminal multiplexer
@@ -42,5 +44,7 @@ reflector                       # Pacman mirror update
 rsync                           # Rsync
 unzip                           # Zip archive
 unrar                           # Rar archive
+p7zip                           # 7zip archive
+youtube-dl                      # Youtube video downloader
 
 # vim: set ts=4 sw=4 tw=0 et :
