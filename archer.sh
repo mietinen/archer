@@ -106,9 +106,9 @@ archer_encrypt() {
         printm 'Setting up encryption'
         echo
         _s dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock
-        _e cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -c aes-xts-plain64 "$rootdev" .root.keyfile
+        _e cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -i 256 -c aes-xts-plain64 "$rootdev" .root.keyfile
         _e cryptsetup -q open "$rootdev" root --key-file .root.keyfile
-        _e cryptsetup -q luksAddKey "$rootdev" --key-file .root.keyfile
+        _e cryptsetup -q luksAddKey "$rootdev" -i 256 --key-file .root.keyfile
         mapper="/dev/mapper/root"
         printm 'Encryption setup'
         showresult
