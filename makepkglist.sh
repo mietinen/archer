@@ -1,26 +1,36 @@
 #!/usr/bin/env bash
-# makepkglist.sh
+#
 # Makes a list of installed groups and packages, with description
-# Usage: bash makepkglist.sh > pkglist.txt
+# Example:
+#   list installed packages:
+#       $ bash makepkglist.sh
+#   list installed packages which is not listed in pkglist.txt
+#       $ bash makepkglist.sh pkglist.txt
+#   to save the list, redirect the output to a file
+#       $ bash makepkglist.sh > pkglist.txt
+#
+## Copyright (c) 2022 Aleksander Mietinen
 
-pacs="$(pacman -Qq | sort)"
-expl="$(pacman -Qqe | sort)"
+pacs="$(pacman -Qq | sort -u)"
+[ -n "$1" ] && listed="$(cat "$@" | grep -o '^[^#]*' | sed 's/ //g' | sort -u)"
+expl="$(comm -23 <(pacman -Qqe | sort -u) <(echo "$listed"))"
 
-echo "# pkglist.txt - package list"
+echo "# Generated with makepkglist.sh"
+echo "# - https://github.com/mietinen/archer"
 echo
 echo "# Groups:"
-for g in $(pacman -Qqg | awk '{print $1}' | uniq); do
-    sqg="$(pacman -Sqg "$g" | sort)"
+for g in $(pacman -Qqg | awk '{print $1}' | sort -u); do
+    sqg="$(pacman -Sqg "$g" | sort -u)"
     count="$(echo "$sqg" | wc -l)"
     matches="$(comm -12 <(echo "$pacs") <(echo "$sqg") | wc -l)"
     if [ $count -eq $matches ] ; then
         pacs="$(comm -23 <(echo "$pacs") <(echo "$sqg"))"
         groups="$groups $g"
-        printf "%-32s%s\n" "$g" "# Group: $g"
+        echo "$listed" | grep -q "$g" || printf "%-32s%s\n" "$g" "# Group: $g"
     fi
 done
 
-gpacs="$(pacman -Sgq $groups | sort)"
+gpacs="$(pacman -Sgq $groups | sort -u)"
 
 echo
 echo "# Other packages:"

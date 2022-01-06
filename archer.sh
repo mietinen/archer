@@ -6,7 +6,7 @@
 #                 * @root, @home, @srv, @var, @swap subvolumes
 #                 * Auto/manual/none swap file
 #
-## license: LGPL-3.0 (http://opensource.org/licenses/lgpl-3.0.html)
+## Copyright (c) 2022 Aleksander Mietinen
 
 # Some settings
 hostname="archer"       # Machine hostname
