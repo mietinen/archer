@@ -1,6 +1,7 @@
 # Basic packages i want on all my systems
 
 # Basic stuff
+linux-zen                       # The Linux ZEN kernel and modules
 base-devel                      # Building tools
 sudo                            # sudo
 openssh                         # SSH
@@ -20,7 +21,6 @@ zsh-autosuggestions             # Zsh Fish like suggestions
 # Terminal apps
 neovim                          # better VIM editor
 neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
-xxd-standalone                  # VIMs hexdump (AUR)
 nano                            # Fallback editor
 ripgrep                         # Better, faster grep
 fzy                             # A better fuzzy finder

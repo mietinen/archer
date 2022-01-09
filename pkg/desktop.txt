@@ -67,11 +67,10 @@ noto-fonts-cjk                  # Font pack
 noto-fonts-emoji                # Font pack
 ttf-nerd-fonts-symbols          # Font pack
 
-# HP printer
+# Printers
 avahi                           # Zero-configuration networking
 nss-mdns                        # .local hostname resolution
 cups                            # open source printing system
-hplip                           # HP Linux Imaging and Printing
 
 # Virtual machines
 qemu                            # Virtualizer/emulator

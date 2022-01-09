@@ -3,7 +3,7 @@
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 200M /boot/efi partition
 #               * btrfs root partition
-#                 * @root, @home, @srv, @var, @swap subvolumes
+#                 * @root, @home, @srv, @var subvolumes
 #                 * Auto/manual/none swap file
 #
 ## Copyright (c) 2022 Aleksander Mietinen
@@ -43,6 +43,9 @@ dotfilesrepo=(
 # End of settings
 # No need edit from here
 # ------------------------------------------------------------------------------
+
+# extended pattern matching
+shopt -s extglob
 
 # EFI and root file system devices
 if [ "${device::8}" == "/dev/nvm" ] ; then
@@ -128,9 +131,6 @@ archer_format() {
     _s btrfs subvolume create /mnt/@home
     _s btrfs subvolume create /mnt/@srv
     _s btrfs subvolume create /mnt/@var
-    if [ "$swapsize" != "0" ] ; then
-        _s btrfs subvolume create /mnt/@swap
-    fi
     _s umount /mnt
     showresult
 }
@@ -144,15 +144,13 @@ archer_mount() {
     _s mount -o subvol=@srv "$mapper" /mnt/srv
     _s mount -o nodatacow,subvol=@var "$mapper" /mnt/var
     if [ "$swapsize" != "0" ] ; then
-        _s mkdir -p /mnt/.swap
-        _s mount -o nodatacow,subvol=@swap "$mapper" /mnt/.swap
-        _s truncate -s 0 /mnt/.swap/swapfile
-        _s chattr +C /mnt/.swap/swapfile
-        _s btrfs property set /mnt/.swap/swapfile compression none
-        _s dd if=/dev/zero of=/mnt/.swap/swapfile bs=1M count="$swapsize"
-        _s chmod 600 /mnt/.swap/swapfile
-        _s mkswap /mnt/.swap/swapfile
-        _s swapon /mnt/.swap/swapfile
+        _s truncate -s 0 /mnt/var/swapfile
+        _s chattr +C /mnt/var/swapfile
+        _s btrfs property set /mnt/var/swapfile compression none
+        _s dd if=/dev/zero of=/mnt/var/swapfile bs=1M count="$swapsize"
+        _s chmod 600 /mnt/var/swapfile
+        _s mkswap /mnt/var/swapfile
+        _s swapon /mnt/var/swapfile
     fi
     if [ -d "/sys/firmware/efi" ] ; then
         _s mkdir -p /mnt/boot/efi
@@ -169,16 +167,9 @@ archer_reflector() {
     showresult
 }
 
-# Installing base to disk
-archer_pacstrap() {
-    printm 'Installing base to disk'
-    _s pacstrap /mnt base linux linux-firmware btrfs-progs sudo
-    _e genfstab -U /mnt >> /mnt/etc/fstab
-    showresult
-}
-
 # Downloading pkglist.txt
 archer_pkgfetch() {
+    mkdir -p /mnt/root
     if [ ${#pkglist[@]} -gt 0 ] ; then
         printm 'Downloading pkglist.txt'
         for pkg in "${pkglist[@]}" ; do
@@ -189,19 +180,28 @@ archer_pkgfetch() {
         showresult
     fi
 
-    if [ ! -r "/mnt/root/pkglist.txt" ] && [ -r "pkglist.txt" ] ; then
+    if [ ! -r /mnt/root/pkglist.txt ] && [ -r pkglist.txt ] ; then
         printm 'Copying pkglist.txt'
         _s cp pkglist.txt /mnt/root/pkglist.txt
         showresult
     fi
 }
 
+# Installing base to disk
+archer_pacstrap() {
+    printm 'Installing base to disk'
+    [ -r /mnt/root/pkglist.txt ] && \
+        kernel="$(_e grep -oE '^[^(#|[:space:])]*' /mnt/root/pkglist.txt | grep -E '^linux(-hardened|-lts|-zen)?$')"
+    _s pacstrap /mnt base ${kernel:-linux} linux-firmware btrfs-progs sudo
+    _e genfstab -U /mnt >> /mnt/etc/fstab
+    showresult
+}
+
 # Copy script to /mnt/root/archer.sh and running arch-chroot
 # Cleaning up files in /mnt/root
 archer_chroot() {
     printm 'Running arch-chroot'
-    _s cp "$0" /mnt/root/archer.sh
-    _s chmod 755 /mnt/root/archer.sh
+    _s install -Dm755 "$0" /mnt/root/archer.sh
     if [ -r .root.keyfile ] ; then
         _s mv .root.keyfile /mnt/boot/.root.keyfile
         _s chmod 600 /mnt/boot/.root.keyfile
@@ -309,10 +309,10 @@ archer_bootloader() {
 
 # Reading packages from pkglist.txt
 archer_readpkg() {
-    if [ -f /root/pkglist.txt ] ; then
+    if [ -r /root/pkglist.txt ] ; then
         printm 'Reading packages from pkglist.txt'
         reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
-        pkgsorted="$(grep -o '^[^#]*' /root/pkglist.txt | sed 's/[[:space:]]*$//;/^[[:space:]]*$/d' | sort -u 2>>err.o)" || err=true
+        pkgsorted="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt | sort -u 2>>err.o)" || err=true
         packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
         aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
         showresult
@@ -333,7 +333,7 @@ archer_pacinstall() {
 archer_etcconf() {
     printm 'Editing som /etc files'
     # nano syntax highlighting
-    [ -f "/etc/nanorc" ] && _s sed -i '/^# include / s/^# //' /etc/nanorc
+    [ -f /etc/nanorc ] && _s sed -i '/^# include / s/^# //' /etc/nanorc
     # Disable internal speaker
     _e echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
     # xorg.conf keyboard settings
@@ -364,7 +364,7 @@ archer_user() {
     _e echo "root ALL=(ALL) ALL" > /etc/sudoers.d/root
     _e echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
     # removed later
-    echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
+    _e echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheelnopasswd
     _s useradd -m -G wheel -s /bin/bash "$username"
     # Other groups
     if pacman -Q libvirt &>/dev/null ; then
@@ -380,7 +380,6 @@ archer_user() {
 # Installing AUR helper and packages
 archer_aurinstall() {
     if [ -n "$aurhelper" ] ; then
-        aurcmd="$(echo "$aurhelper" | sed -r 's/-(bin|git)//g')"
         # Installing AUR helper
         printm "Installing AUR helper ($aurhelper)"
         _s pacman --noconfirm --needed -S base-devel git
@@ -392,7 +391,7 @@ archer_aurinstall() {
         if [ -n "$aurpackages" ] ; then
             printm 'Installing AUR packages (Failures can be checked out manually later)'
             for aur in $aurpackages; do
-                _s sudo -u "$username" "$aurcmd" -S --noconfirm "$aur"
+                _s sudo -u "$username" "${aurhelper%-@(bin|git)}" -S --noconfirm "$aur"
             done
             showresult
         fi
@@ -541,8 +540,8 @@ if [ "$1" != "--chroot" ]; then
     archer_format
     archer_mount
     # archer_reflector
-    archer_pacstrap
     archer_pkgfetch
+    archer_pacstrap
     archer_chroot
 else
     archer_locale

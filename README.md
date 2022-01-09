@@ -26,6 +26,7 @@ You can make you're own pkglist.txt using the makepkglist.sh script `bash makepk
 or simply `pacman -Qqe > pkglist.txt`
 
 The script first installs what it finds in official repositories, then tries what's left from the AUR repositories. Installing AUR packages depends on `aurhelper`  
+If a specific kernel isn't listed in pkglist.txt (linux, linux-hardened, linux-lts, linux-zen), it defaults to the linux kernel. If you want more than one kernel, all have to be listed.  
 
 ## Dotfiles
 

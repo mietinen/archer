@@ -1,6 +1,7 @@
 # Packages specific for my X1 Carbon
 
-acpi_call                       # 4G/LTE modem hack
+acpi_call-dkms                  # 4G/LTE modem hack
+linux-zen-headers               # ZEN headers and scripts
 intel-media-driver              # Intel graphics
 modemmanager                    # 4G/LTE modem manager
 sof-firmware                    # Sound driver
