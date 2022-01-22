@@ -3,17 +3,17 @@
 # Makes a list of installed groups and packages, with description
 # Example:
 #   list installed packages:
-#       $ bash makepkglist.sh
+#       $ ./makepkglist.sh
 #   list installed packages which is not listed in pkglist.txt
-#       $ bash makepkglist.sh pkglist.txt
+#       $ ./makepkglist.sh pkglist.txt [pkglist2.txt ..]
 #   to save the list, redirect the output to a file
-#       $ bash makepkglist.sh > pkglist.txt
+#       $ ./makepkglist.sh > pkglist.txt
 #
 ## Copyright (c) 2022 Aleksander Mietinen
 
 pacs="$(pacman -Qq | sort -u)"
-[ -n "$1" ] && listed="$(cat "$@" | grep -o '^[^#]*' | sed 's/ //g' | sort -u)"
-expl="$(comm -23 <(pacman -Qqe | sort -u) <(echo "$listed"))"
+[ -n "$1" ] && list="$(cat "$@" | grep -oE '^[^(#|[:space:])]*' | sort -u)"
+expl="$(comm -23 <(pacman -Qqe | sort -u) <(echo "$list"))"
 
 echo "# Generated with makepkglist.sh"
 echo "# - https://github.com/mietinen/archer"
@@ -26,7 +26,7 @@ for g in $(pacman -Qqg | awk '{print $1}' | sort -u); do
     if [ $count -eq $matches ] ; then
         pacs="$(comm -23 <(echo "$pacs") <(echo "$sqg"))"
         groups="$groups $g"
-        echo "$listed" | grep -q "$g" || printf "%-32s%s\n" "$g" "# Group: $g"
+        echo "$list" | grep -q "$g" || printf "%-32s%s\n" "$g" "# Group: $g"
     fi
 done
 

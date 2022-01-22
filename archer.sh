@@ -191,7 +191,7 @@ archer_pkgfetch() {
 archer_pacstrap() {
     printm 'Installing base to disk'
     [ -r /mnt/root/pkglist.txt ] && \
-        kernel="$(_e grep -oE '^[^(#|[:space:])]*' /mnt/root/pkglist.txt | grep -E '^linux(-hardened|-lts|-zen)?$')"
+        kernel="$(_e grep -oE '^[^(#|[:space:])]*' /mnt/root/pkglist.txt | grep -E '^linux(-hardened|-lts|-zen)?$' | tr '\n' ' ')"
     _s pacstrap /mnt base ${kernel:-linux} linux-firmware btrfs-progs sudo
     _e genfstab -U /mnt >> /mnt/etc/fstab
     showresult
@@ -311,10 +311,10 @@ archer_bootloader() {
 archer_readpkg() {
     if [ -r /root/pkglist.txt ] ; then
         printm 'Reading packages from pkglist.txt'
-        reposorted="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
-        pkgsorted="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt | sort -u 2>>err.o)" || err=true
-        packages=$(comm -12 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
-        aurpackages=$(comm -13 <(echo "$reposorted") <(echo "$pkgsorted") | tr '\n' ' ' 2>>err.o) || err=true
+        repo="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
+        list="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt | sort -u 2>>err.o)" || err=true
+        packages=$(comm -12 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
+        aurpackages=$(comm -13 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
         showresult
     fi
 }
@@ -323,6 +323,8 @@ archer_readpkg() {
 archer_pacinstall() {
     if [ -n "$packages" ] ; then
         printm 'Installing extra packages'
+        # Can be needed if iso is old.
+        _s pacman --noconfirm -Sy archlinux-keyring
         # --ask 4: ALPM_QUESTION_CONFLICT_PKG = (1 << 2)
         _s pacman --noconfirm --needed --ask 4 -S $packages
         showresult
