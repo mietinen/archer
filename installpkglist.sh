@@ -8,7 +8,7 @@
 aurcmd="paru"
 
 if [ ! -r "$1" ]; then
-    echo "Usage $(basename $0) <pkglist.txt>"
+    echo "Usage ${0##*/} <pkglist.txt>"
     exit 1
 fi
 

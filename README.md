@@ -5,7 +5,7 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 * /boot/efi partition (200M)
     * EFI/legacy support
 * root btrfs partition
-    * @root, @home, @srv, @var, @swap subvolumes
+    * @root, @home, @srv, @var, @snap subvolumes
     * DBpath moved to /usr/lib/pacman for snapshot
     * dm-crypt/LUKS support
 * swap file (Auto/manual/none)
@@ -30,4 +30,4 @@ If a specific kernel isn't listed in pkglist.txt (linux, linux-hardened, linux-l
 
 ## Dotfiles
 
-Feel free to use my dotfiles, but it doesn't contain much useful stuff.
+Feel free to use my dotfiles.

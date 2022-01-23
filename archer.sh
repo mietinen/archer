@@ -3,7 +3,7 @@
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 200M /boot/efi partition
 #               * btrfs root partition
-#                 * @root, @home, @srv, @var subvolumes
+#                 * @root, @home, @srv, @var, @snap subvolumes
 #                 * Auto/manual/none swap file
 #
 ## Copyright (c) 2022 Aleksander Mietinen
@@ -17,6 +17,7 @@ locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
 swapsize="auto"         # Size of swap file in MB (auto=MemTotal, 0=no swap)
+snapsub=true            # Create @snap to avoid nested snapshots subvolume
 encrypt=true            # Set up dm-crypt/LUKS on root partition
 multilib=true           # Enable multilib (true/false)
 aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
@@ -131,6 +132,7 @@ archer_format() {
     _s btrfs subvolume create /mnt/@home
     _s btrfs subvolume create /mnt/@srv
     _s btrfs subvolume create /mnt/@var
+    [ "$snapsub" = true ] && _s btrfs subvolume create /mnt/@snap
     _s umount /mnt
     showresult
 }
@@ -138,11 +140,14 @@ archer_format() {
 # Mounting partitions
 archer_mount() {
     printm 'Mounting partitions'
-    _s mount -o subvol=@root "$mapper" /mnt
-    _s mkdir -p /mnt/{home,srv,var}
-    _s mount -o subvol=@home "$mapper" /mnt/home
-    _s mount -o subvol=@srv "$mapper" /mnt/srv
+    opt="compress=zstd"
+    _s mount -o $opt,subvol=@root "$mapper" /mnt
+    _s mkdir -p /mnt/{home,srv,var,.snapshots}
+    _s mount -o $opt,subvol=@home "$mapper" /mnt/home
+    _s mount -o $opt,subvol=@srv "$mapper" /mnt/srv
     _s mount -o nodatacow,subvol=@var "$mapper" /mnt/var
+    [ "$snapsub" = true ] && \
+        _s mount -o $opt,subvol=@snap "$mapper" /mnt/.snapshots
     if [ "$swapsize" != "0" ] ; then
         _s truncate -s 0 /mnt/var/swapfile
         _s chattr +C /mnt/var/swapfile
