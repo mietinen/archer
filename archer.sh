@@ -93,12 +93,13 @@ archer_keyclock() {
 archer_partition() {
     printm 'Setting up partitions'
     if [ -d "/sys/firmware/efi" ] ; then
-        _s parted -s "$device" mklabel gpt
-        _s sgdisk "$device" -n=1:0:+200M -t=1:ef00
-        _s sgdisk "$device" -n=2:0:0
+        _s parted -s "$device" mklabel gpt \
+            mkpart esp 0% 300MiB \
+            mkpart primary 300MiB 100% \
+            set 1 esp on
     else
-        _s parted -s "$device" mklabel msdos
-        _s echo -e "n\np\n\n\n\nw" | fdisk "$device"
+        _s parted -s "$device" mklabel msdos \
+            mkpart primary 0% 100%
     fi
     showresult
 }
