@@ -2,6 +2,7 @@
 
 android-tools                   # Android platform tools
 bash-language-server            # Bash language server
+shellcheck-bin                  # Check sh/bash scripts (AUR)
 go                              # Go programming language
 gopls                           # Go language server
 rust                            # Rust programming language
@@ -11,5 +12,6 @@ lua-language-server             # Lua language server
 stylua-bin                      # Lua code formatter (AUR)
 prettier                        # HTML/JS/TS/JSON code formatter
 zola                            # Zola static site engine
+lazygit                         # Simple terminal UI for git commands
 
 # vim: set ts=4 sw=4 tw=0 et :

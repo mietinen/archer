@@ -25,12 +25,10 @@ nano                            # Fallback editor
 ripgrep                         # Better, faster grep
 fzy                             # A better fuzzy finder
 bat                             # Cat with syntax highlighting
-lazygit                         # Simple terminal UI for git commands
 mlocate                         # locate/updatedb
 tree                            # tree
 nnn                             # Terminal file manager
 trash-cli                       # Trash cli, for nnn
-shellcheck-bin                  # Check sh/bash scripts (AUR)
 weechat                         # IRC client
 tmux                            # Terminal multiplexer
 iperf3                          # Network speed test
