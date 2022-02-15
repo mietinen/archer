@@ -1,7 +1,7 @@
 # Basic packages i want on all my systems
 
 # Basic stuff
-linux-zen                       # The Linux ZEN kernel and modules
+linux                           # The Linux kernel and modules
 base-devel                      # Building tools
 sudo                            # sudo
 openssh                         # SSH

@@ -56,6 +56,7 @@ dmidecode                       # System information
 fwupd                           # UEFI bios update
 smbclient                       # SMB client
 gvfs-smb                        # Thunar SMB support
+rclone                          # Cloud file sync
 libva-utils                     # Verifying video HW accel
 
 # Fonts
