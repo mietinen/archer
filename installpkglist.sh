@@ -12,7 +12,7 @@ if [ ! -r "$1" ]; then
     exit 1
 fi
 
-list="$(cat "$1" | grep -oE '^[^(#|[:space:])]*' | sort -u)"
+list="$(grep -oE '^[^(#|[:space:])]*' "$1" | sort -u)"
 repo="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u)"
 packages=$(comm -12 <(echo "$repo") <(echo "$list") | tr '\n' ' ')
 aurpackages=$(comm -13 <(echo "$repo") <(echo "$list") | tr '\n' ' ')
@@ -31,5 +31,3 @@ pacman --noconfirm --needed --ask 4 -S $packages
 for aur in $aurpackages; do
     "$aurcmd" -S --noconfirm "$aur"
 done
-
-# vim: set ts=4 sw=4 tw=0 et :

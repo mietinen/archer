@@ -22,12 +22,13 @@ zsh-autosuggestions             # Zsh Fish like suggestions
 neovim                          # better VIM editor
 neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
 nano                            # Fallback editor
+zk                              # Zettelkasten or personal wiki
 ripgrep                         # Better, faster grep
-fzy                             # A better fuzzy finder
+fzf                             # Command-line fuzzy finder
 bat                             # Cat with syntax highlighting
 mlocate                         # locate/updatedb
 tree                            # tree
-nnn                             # Terminal file manager
+lf                              # Terminal file manager
 trash-cli                       # Trash cli, for nnn
 weechat                         # IRC client
 tmux                            # Terminal multiplexer
@@ -43,6 +44,4 @@ rsync                           # Rsync
 unzip                           # Zip archive
 unrar                           # Rar archive
 p7zip                           # 7zip archive
-youtube-dl                      # Youtube video downloader
-
-# vim: set ts=4 sw=4 tw=0 et :
+yt-dlp                          # Youtube video downloader

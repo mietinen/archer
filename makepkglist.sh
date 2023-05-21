@@ -39,5 +39,3 @@ for p in $(comm -23 <(echo "$expl") <(echo "$gpacs")); do
     pacman -Qm "$p" >/dev/null 2>&1 && aur=" (AUR)" || aur=""
     printf "%-32s%s\n" "$p" "#$desc$aur"
 done
-
-# vim: set ts=4 sw=4 tw=0 et :

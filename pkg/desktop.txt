@@ -1,41 +1,26 @@
 # Packages for all my desktops (awesome window manager)
 
+# Awesome wm
+awesome                         # window manager
+rofi                            # dmenu replacement
+picom                           # Compositor for Xorg
+nitrogen                        # Wallpaper tool
+scrot                           # Simple command-line screenshot
+polkit-gnome                    # Polkit
+gnome-keyring                   # Password management
+libnotify                       # Desktop notifications
+arandr                          # Graphical xrandr front-end
+autorandr                       # Auto detect display, xrandr
+light-locker                    # Screen lock
+thunar                          # GTK+ file manager
+xarchiver                       # Thunar file archive support
+pavucontrol                     # PulseAudio GTK Volume Control
+
 # Xorg
 xorg                            # Xorg display server
 xdg-user-dirs                   # XDG user directories
 xclip                           # Clipboard
 xorg-appres                     # Xresources rofi themes
-
-# Sound
-pipewire                        # Multimedia framework
-pipewire-pulse                  # PulseAudio replacement
-pamixer                         # PulseAudio Volume Control
-pulsemixer                      # PulseAudio Volume Control
-
-# Network
-networkmanager                  # NetworkManager
-nm-connection-editor            # NetworkManager GUI connection editor
-networkmanager-dmenu-git        # NetworkManager menu dmenu/rofi (AUR)
-networkmanager-openvpn          # NetworkManager openvpn support
-wavemon                         # Wifi monitoring
-nmap                            # Network mapper, Port scanner
-ufw                             # Uncomplicated Firewall
-
-# awesome wm
-awesome                         # window manager
-rofi                            # dmenu replacement
-polkit-gnome                    # Polkit
-gnome-keyring                   # Password management
-picom                           # Compositor for Xorg
-libnotify                       # Desktop notifications
-nitrogen                        # Wallpaper tool
-arandr                          # Graphical xrandr front-end
-autorandr                       # Auto detect display, xrandr
-pavucontrol                     # PulseAudio GTK Volume Control
-light-locker                    # Screen lock
-thunar                          # GTK+ file manager
-xarchiver                       # Thunar file archive support
-scrot                           # Simple command-line screenshot
 
 # Desktop manager
 lightdm                         # Display manager, logon screen
@@ -50,15 +35,6 @@ gruvbox-material-gtk-theme-git  # GTK theme (AUR)
 gruvbox-material-icon-theme-git # Icon theme (AUR)
 qt5-styleplugins                # Qt GTK theme support (AUR)
 
-# Utility
-usbutils                        # lsusb
-dmidecode                       # System information
-fwupd                           # UEFI bios update
-smbclient                       # SMB client
-gvfs-smb                        # Thunar SMB support
-rclone                          # Cloud file sync
-libva-utils                     # Verifying video HW accel
-
 # Fonts
 adobe-source-code-pro-fonts     # Font pack
 ttf-inconsolata                 # Font pack
@@ -68,17 +44,34 @@ noto-fonts-cjk                  # Font pack
 noto-fonts-emoji                # Font pack
 ttf-nerd-fonts-symbols          # Font pack
 
+# Sound
+pipewire                        # Multimedia framework
+pipewire-pulse                  # PulseAudio replacement
+pamixer                         # PulseAudio Volume Control
+pulsemixer                      # PulseAudio Volume Control
+
+# Network
+networkmanager                  # NetworkManager
+nm-connection-editor            # NetworkManager GUI connection editor
+networkmanager-dmenu-git        # NetworkManager menu dmenu/rofi (AUR)
+networkmanager-openvpn          # NetworkManager openvpn support
+ufw                             # Uncomplicated Firewall
+
 # Printers
 avahi                           # Zero-configuration networking
 nss-mdns                        # .local hostname resolution
 cups                            # open source printing system
 
-# Virtual machines
-qemu                            # Virtualizer/emulator
-virt-manager                    # VM managing GUI
-dnsmasq                         # VM networking
-iptables-nft                    # VM networking
-edk2-ovmf                       # VM UEFI support
+# Utility
+usbutils                        # lsusb
+dmidecode                       # System information
+fwupd                           # UEFI bios update
+smbclient                       # SMB client
+gvfs-smb                        # Thunar SMB support
+rclone                          # Cloud file sync
+libva-utils                     # Verifying video HW accel
+dos2unix                        # text file format converter
+perl-image-exiftool             # file EXIF informations
 
 # apps
 alacritty                       # Terminal
@@ -88,14 +81,30 @@ chromium                        # Web browser
 syncthing                       # File synchronization
 spotify                         # Music streaming (AUR)
 plex-media-player               # Video streaming desktop client (AUR)
-viewnior                        # Image viewer
+imv                             # Image viewer
 mpv                             # Video player
-mupdf                           # PDF viewer
+zathura-pdf-poppler             # PDF viewer
 libreoffice-fresh               # LibreOffice
+pinta                           # Editing program modeled after Paint.NET
 gimp                            # GNU Image Manipulation Program
 discord                         # Discord VoIP game chat
 ventoy-bin                      # Multiboot USB drive (AUR)
-wireshark-qt                    # Network monitor tool
 icaclient                       # Citrix receiver (AUR)
+newsboat                        # Terminal RSS/Atom feed reader
 
-# vim: set ts=4 sw=4 tw=0 et :
+# Virtual machines
+qemu-desktop                    # Virtualizer/emulator
+virt-manager                    # VM managing GUI
+dnsmasq                         # VM networking
+iptables-nft                    # VM networking
+edk2-ovmf                       # VM UEFI support
+
+# Basic pentesting/networking tools
+nmap                            # portscan (includes ncat)
+wavemon                         # Wifi monitoring
+wireshark-qt                    # network protocol analyzer
+mitmproxy                       # MITM HTTPS proxy
+python-shodan                   # command-line utility for Shodan
+aircrack-ng                     # WEP and WPA-PSK cracker
+tcpdump                         # network packet analyzer
+bettercap                       # Network Swiss army knife

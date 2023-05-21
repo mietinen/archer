@@ -9,9 +9,8 @@ rust                            # Rust programming language
 rust-analyzer                   # Rust language server
 pyright                         # Python language server
 lua-language-server             # Lua language server
-stylua-bin                      # Lua code formatter (AUR)
+stylua                          # Lua code formatter
 prettier                        # HTML/JS/TS/JSON code formatter
 zola                            # Zola static site engine
 lazygit                         # Simple terminal UI for git commands
-
-# vim: set ts=4 sw=4 tw=0 et :
+jq                              # Command-line JSON processor

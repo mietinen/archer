@@ -8,7 +8,9 @@
 #
 ## Copyright (c) 2022 Aleksander Mietinen
 
+# ------------------------------------------------------------------------------
 # Some settings
+# ------------------------------------------------------------------------------
 hostname="archer"       # Machine hostname
 username="mietinen"     # Main user
 device="/dev/nvme0n1"   # Drive for install (/dev/nvme0n1, /dev/sda, etc)
@@ -23,7 +25,9 @@ multilib=true           # Enable multilib (true/false)
 aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
                         # Also installs: base-devel git
 
+# ------------------------------------------------------------------------------
 # pkglist.txt for extra packages (none will use pkglist.txt from local directory)
+# ------------------------------------------------------------------------------
 pkglist=(
     "https://raw.githubusercontent.com/mietinen/archer/master/pkg/pkglist.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/dev.txt"
@@ -33,10 +37,11 @@ pkglist=(
     # "https://raw.githubusercontent.com/mietinen/archer/master/pkg/pentest.txt"
 )
 
-# Dotfiles git repo (blank for none)
+# ------------------------------------------------------------------------------
+# Dotfiles git repo (git bare style)
+# ------------------------------------------------------------------------------
 dotfilesrepo=(
-    "https://github.com/mietinen/shell.git"
-    # "https://github.com/mietinen/desktop.git"
+    "https://github.com/mietinen/dots.git"
 )
 
 
@@ -44,11 +49,11 @@ dotfilesrepo=(
 # End of settings
 # No need edit from here
 # ------------------------------------------------------------------------------
-
-# extended pattern matching
 shopt -s extglob
 
+# ------------------------------------------------------------------------------
 # EFI and root file system devices
+# ------------------------------------------------------------------------------
 if [ "${device::8}" == "/dev/nvm" ] ; then
     if [ -d "/sys/firmware/efi" ] ; then
         efidev="${device}p1"
@@ -65,11 +70,15 @@ else
     fi
 fi
 
+# ------------------------------------------------------------------------------
 # Set size of swap file same as total memory if set as auto
+# ------------------------------------------------------------------------------
 [ "$swapsize" = "auto" ] && \
     swapsize=$((($(grep MemTotal /proc/meminfo | awk '{print $2}')+500)/1000))
 
+# ------------------------------------------------------------------------------
 # Run at launch
+# ------------------------------------------------------------------------------
 archer_check() {
     if [ ! "$(uname -n)" = "archiso" ]; then
         echo "This script is ment to be run from the Archlinux live medium."
@@ -81,7 +90,9 @@ archer_check() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Setting up keyboard and clock
+# ------------------------------------------------------------------------------
 archer_keyclock() {
     printm 'Setting up keyboard and clock'
     _s loadkeys "$keymap"
@@ -89,7 +100,9 @@ archer_keyclock() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Setting up partitions
+# ------------------------------------------------------------------------------
 archer_partition() {
     printm 'Setting up partitions'
     if [ -d "/sys/firmware/efi" ] ; then
@@ -104,7 +117,9 @@ archer_partition() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Setting up encryption
+# ------------------------------------------------------------------------------
 archer_encrypt() {
     mapper="$rootdev"
     if [ "$encrypt" = true ] ; then
@@ -120,7 +135,9 @@ archer_encrypt() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Formating partitions
+# ------------------------------------------------------------------------------
 archer_format() {
     printm 'Formating partitions'
     if [ -d "/sys/firmware/efi" ] ; then
@@ -138,7 +155,9 @@ archer_format() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Mounting partitions
+# ------------------------------------------------------------------------------
 archer_mount() {
     printm 'Mounting partitions'
     opt="compress=zstd"
@@ -150,12 +169,7 @@ archer_mount() {
     [ "$snapsub" = true ] && \
         _s mount -o $opt,subvol=@snap "$mapper" /mnt/.snapshots
     if [ "$swapsize" != "0" ] ; then
-        _s truncate -s 0 /mnt/var/swapfile
-        _s chattr +C /mnt/var/swapfile
-        _s btrfs property set /mnt/var/swapfile compression none
-        _s dd if=/dev/zero of=/mnt/var/swapfile bs=1M count="$swapsize"
-        _s chmod 600 /mnt/var/swapfile
-        _s mkswap /mnt/var/swapfile
+        _s btrfs filesystem mkswapfile --size "${swapsize}m" --uuid clear /mnt/var/swapfile
         _s swapon /mnt/var/swapfile
     fi
     if [ -d "/sys/firmware/efi" ] ; then
@@ -165,7 +179,9 @@ archer_mount() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Installing and running reflector to generate mirrorlist
+# ------------------------------------------------------------------------------
 archer_reflector() {
     printm 'Installing and running reflector to generate mirrorlist'
     _s pacman --noconfirm --needed -Sy reflector
@@ -173,7 +189,9 @@ archer_reflector() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Downloading pkglist.txt
+# ------------------------------------------------------------------------------
 archer_pkgfetch() {
     mkdir -p /mnt/root
     if [ ${#pkglist[@]} -gt 0 ] ; then
@@ -193,7 +211,9 @@ archer_pkgfetch() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Installing base to disk
+# ------------------------------------------------------------------------------
 archer_pacstrap() {
     printm 'Installing base to disk'
     [ -r /mnt/root/pkglist.txt ] && \
@@ -203,8 +223,10 @@ archer_pacstrap() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Copy script to /mnt/root/archer.sh and running arch-chroot
 # Cleaning up files in /mnt/root
+# ------------------------------------------------------------------------------
 archer_chroot() {
     printm 'Running arch-chroot'
     _s install -Dm755 "$0" /mnt/root/archer.sh
@@ -219,9 +241,13 @@ archer_chroot() {
         /mnt/err.o
 }
 
+# ------------------------------------------------------------------------------
 # Run after arch-chroot
+# ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 # Setting up locale and keyboard
+# ------------------------------------------------------------------------------
 archer_locale() {
     printm 'Setting up locale and keyboard'
     _s sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen
@@ -245,7 +271,9 @@ archer_locale() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Setting timezone and adjtime
+# ------------------------------------------------------------------------------
 archer_timezone() {
     printm 'Setting timezone and adjtime'
     _s ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime
@@ -253,7 +281,9 @@ archer_timezone() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Setting hostname
+# ------------------------------------------------------------------------------
 archer_hostname() {
     printm 'Setting hostname'
     _e printf "%s\n" "$hostname" > /etc/hostname
@@ -263,7 +293,9 @@ archer_hostname() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Creating new initramfs
+# ------------------------------------------------------------------------------
 archer_initramfs() {
     printm 'Creating new initramfs'
     _s sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf
@@ -278,7 +310,9 @@ archer_initramfs() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Changes to pacman.conf and makepkg.conf
+# ------------------------------------------------------------------------------
 archer_pacconf() {
     printm 'Changes to pacman.conf and makepkg.conf'
     _s sed -i "s/^#\(Color\)/\1/" /etc/pacman.conf
@@ -294,10 +328,12 @@ archer_pacconf() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Installing bootloader
+# ------------------------------------------------------------------------------
 archer_bootloader() {
     printm 'Installing bootloader'
-    _s pacman --noconfirm --needed -Sy grub grub-btrfs
+    _s pacman --noconfirm --needed -Sy grub grub-btrfs inotify-tools
     if [ "$encrypt" = true ] ; then
         rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
         _s sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid"':root:allow-discards cryptkey=rootfs:\/boot\/.root.keyfile"/' /etc/default/grub
@@ -313,7 +349,9 @@ archer_bootloader() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Reading packages from pkglist.txt
+# ------------------------------------------------------------------------------
 archer_readpkg() {
     if [ -r /root/pkglist.txt ] ; then
         printm 'Reading packages from pkglist.txt'
@@ -325,7 +363,9 @@ archer_readpkg() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Installing extra packages
+# ------------------------------------------------------------------------------
 archer_pacinstall() {
     if [ -n "$packages" ] ; then
         printm 'Installing extra packages'
@@ -337,11 +377,11 @@ archer_pacinstall() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Editing som /etc files
+# ------------------------------------------------------------------------------
 archer_etcconf() {
     printm 'Editing som /etc files'
-    # nano syntax highlighting
-    [ -f /etc/nanorc ] && _s sed -i '/^# include / s/^# //' /etc/nanorc
     # Disable internal speaker
     _e echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
     # xorg.conf keyboard settings
@@ -364,7 +404,9 @@ EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Adding user and setting password
+# ------------------------------------------------------------------------------
 archer_user() {
     printm 'Adding user and setting password'
     mkdir -p /etc/sudoers.d/
@@ -385,7 +427,9 @@ archer_user() {
     passwd "$username"
 }
 
+# ------------------------------------------------------------------------------
 # Installing AUR helper and packages
+# ------------------------------------------------------------------------------
 archer_aurinstall() {
     if [ -n "$aurhelper" ] ; then
         # Installing AUR helper
@@ -406,7 +450,9 @@ archer_aurinstall() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Installing dotfiles from git repo
+# ------------------------------------------------------------------------------
 archer_dotfiles() {
     if [ ${#dotfilesrepo[@]} -gt 0 ] ; then
         printm 'Installing dotfiles from git repo'
@@ -422,7 +468,9 @@ archer_dotfiles() {
     fi
 }
 
+# ------------------------------------------------------------------------------
 # Enabeling installed services
+# ------------------------------------------------------------------------------
 archer_services() {
     printm 'Enabeling services (Created symlink "errors" can be ignored)'
     # Services: network manager
@@ -514,11 +562,15 @@ archer_services() {
     showresult
 }
 
+# ------------------------------------------------------------------------------
 # Short function to silent command outputs
+# ------------------------------------------------------------------------------
 _s() { "$@" >/dev/null 2>>err.o || err=true; }
 _e() { "$@" 2>>err.o || err=true; }
 
+# ------------------------------------------------------------------------------
 # Printing OK/ERROR
+# ------------------------------------------------------------------------------
 showresult() {
     if [ "$err" ] ; then
         printf ' \e[1;31m[ERROR]\e[m\n'
@@ -533,7 +585,9 @@ showresult() {
     unset err
 }
 
+# ------------------------------------------------------------------------------
 # Padding
+# ------------------------------------------------------------------------------
 width=$(($(tput cols)-15))
 padding=$(printf '.%.0s' {1..500})
 printm() {
@@ -567,5 +621,3 @@ else
     archer_services
     rm -f /etc/sudoers.d/wheelnopasswd
 fi
-
-# vim: set ts=4 sw=4 tw=0 et :

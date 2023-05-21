@@ -7,5 +7,3 @@ opencl-nvidia                   # Nvidia OpenCL
 os-prober                       # Windows detect for dual boot
 steam                           # Valve software delivery system
 lutris                          # Open gaming platform
-
-# vim: set ts=4 sw=4 tw=0 et :
