@@ -504,7 +504,18 @@ archer_services() {
     fi
 
     # Services: display manager
-    if pacman -Q lightdm &>/dev/null ; then
+    if pacman -Q ly &>/dev/null ; then
+        cat <<EOF > /etc/pam.d/ly
+#%PAM-1.0
+auth        include     system-login
+-auth       optional    pam_gnome_keyring.so
+account     include     system-login
+password    include     system-login
+session     include     system-login
+-session    optional    pam_gnome_keyring.so auto_start
+EOF
+        _s systemctl enable ly.service
+    elif pacman -Q lightdm &>/dev/null ; then
         _s systemctl enable lightdm.service
 
     elif pacman -Q lxdm &>/dev/null ; then

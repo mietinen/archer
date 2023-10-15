@@ -21,7 +21,6 @@ zsh-autosuggestions             # Zsh Fish like suggestions
 # Terminal apps
 neovim                          # better VIM editor
 neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
-nano                            # Fallback editor
 zk                              # Zettelkasten or personal wiki
 ripgrep                         # Better, faster grep
 fzf                             # Command-line fuzzy finder
@@ -34,7 +33,8 @@ weechat                         # IRC client
 tmux                            # Terminal multiplexer
 iperf3                          # Network speed test
 ookla-speedtest-bin             # Speedtest.net CLI client (AUR)
-htop                            # Process viewer
+htop                            # Interactive process viewer
+bottom                          # A graphical process/system monitor
 pv                              # Pipe viewer
 whois                           # Domain lookup
 neofetch                        # Terminal splash
