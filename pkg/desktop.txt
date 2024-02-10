@@ -47,7 +47,7 @@ ttf-nerd-fonts-symbols          # Font pack
 # Sound
 pipewire                        # Multimedia framework
 pipewire-pulse                  # PulseAudio replacement
-pamixer                         # PulseAudio Volume Control
+wireplumber                     # Session / policy manager implementation for PipeWire
 pulsemixer                      # PulseAudio Volume Control
 
 # Network
