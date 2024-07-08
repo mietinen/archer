@@ -33,7 +33,8 @@ papirus-icon-theme              # Icon theme
 archlinux-wallpaper             # Wallpaper pack
 gruvbox-material-gtk-theme-git  # GTK theme (AUR)
 gruvbox-material-icon-theme-git # Icon theme (AUR)
-qt5-styleplugins                # Qt GTK theme support (AUR)
+qt5gtk2                         # GTK+2.0 integration plugins for Qt5
+qt6gtk2                         # GTK+2.0 integration plugins for Qt6
 
 # Fonts
 adobe-source-code-pro-fonts     # Font pack
@@ -51,6 +52,8 @@ wireplumber                     # Session / policy manager implementation for Pi
 pulsemixer                      # PulseAudio Volume Control
 
 # Network
+wireguard-tools                 # WireGuard tools for configuration
+systemd-resolvconf              # systemd resolvconf replacement
 networkmanager                  # NetworkManager
 nm-connection-editor            # NetworkManager GUI connection editor
 networkmanager-dmenu-git        # NetworkManager menu dmenu/rofi (AUR)
@@ -79,7 +82,7 @@ qalculate-gtk                   # Calculator
 firefox                         # Web browser
 chromium                        # Web browser
 syncthing                       # File synchronization
-spotify                         # Music streaming (AUR)
+spotify-launcher                # Music streaming
 plex-media-player               # Video streaming desktop client (AUR)
 imv                             # Image viewer
 mpv                             # Video player

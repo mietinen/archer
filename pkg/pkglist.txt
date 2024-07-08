@@ -10,7 +10,6 @@ snapper                         # Btrfs snapshots tool
 man-pages                       # Linux man pages
 archlinux-contrib               # Collection of contrib scripts used in Arch Linux
 pacman-contrib                  # Contributed scripts and tools for pacman systems
-intel-ucode                     # Intel Microcode
 lm_sensors                      # Temp sensors
 sshfs                           # Mount SSH drives
 zsh                             # Z shell
@@ -27,6 +26,7 @@ fzf                             # Command-line fuzzy finder
 bat                             # Cat with syntax highlighting
 mlocate                         # locate/updatedb
 tree                            # tree
+progress                        # Coreutils Progress Viewer
 lf                              # Terminal file manager
 trash-cli                       # Trash cli, for nnn
 weechat                         # IRC client

@@ -14,3 +14,5 @@ prettier                        # HTML/JS/TS/JSON code formatter
 zola                            # Zola static site engine
 lazygit                         # Simple terminal UI for git commands
 jq                              # Command-line JSON processor
+podman                          # Docker alternativ
+podman-compose                  # run docker-compose.yml using podman
