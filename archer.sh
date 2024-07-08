@@ -32,7 +32,7 @@ pkglist=(
     "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pkglist.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/dev.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/desktop.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/carbon.txt"
+    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/p14s.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/gaming.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pentest.txt"
 )
@@ -317,7 +317,8 @@ archer_pacconf() {
     printm 'Changes to pacman.conf and makepkg.conf'
     _s sed -i "s/^#\(Color\)/\1/" /etc/pacman.conf
     _s sed -i "s/^#\(ParallelDownloads\)/\1/" /etc/pacman.conf
-    _s sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
+    _s sed -i "s/^#\?\(MAKEFLAGS.*\)-j[0-9]\+\(.*\)/\1-j$(nproc)\2/" /etc/makepkg.conf
+    # _s sed -i '/^OPTIONS/s/\([ (]\)debug/\1!debug/' /etc/makepkg.conf
     if [ "$multilib" = true ] ; then
         _s sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
     fi
@@ -345,6 +346,13 @@ archer_bootloader() {
     else
         _s grub-install --target=i386-pc --recheck "$device"
     fi
+
+    vendor="$(awk '/^vendor_id/ {print $NF;exit}' /proc/cpuinfo)"
+    case "${vendor,,}" in
+        *intel*) _s pacman --noconfirm --needed -S intel-ucode ;;
+        *amd*) _s pacman --noconfirm --needed -Sy amd-ucode ;;
+    esac
+
     _s grub-mkconfig -o /boot/grub/grub.cfg
     showresult
 }
@@ -385,13 +393,17 @@ archer_etcconf() {
     # Disable internal speaker
     _e echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
     # xorg.conf keyboard settings
-    mkdir -p /etc/X11/xorg.conf.d/
-    _e printf 'Section "InputClass"
+    if pacman -Q xorg-server &>/dev/null ; then
+        mkdir -p /etc/X11/xorg.conf.d/
+        _e cat <<EOF >/etc/X11/xorg.conf.d/00-keyboard.conf
+Section "InputClass"
     Identifier "system-keyboard"
     MatchIsKeyboard "on"
-    Option "XkbLayout" "%s"
+    Option "XkbLayout" "${keymap}"
     Option "XkbOptions" "nbsp:none"
-EndSection\n' "$keymap" >/etc/X11/xorg.conf.d/00-keyboard.conf
+EndSection
+EOF
+    fi
     # .local hostname resolution
     if pacman -Q nss-mdns &>/dev/null ; then
         grep -e "hosts:.*mdns_minimal" /etc/nsswitch.conf &>/dev/null || \
@@ -477,6 +489,9 @@ archer_services() {
     if pacman -Q networkmanager &>/dev/null ; then
         _s systemctl enable NetworkManager.service
         _s systemctl enable NetworkManager-wait-online.service
+        _s systemctl enable systemd-resolved.service
+        umount /etc/resolv.conf 2>/dev/null
+        _s ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
     elif pacman -Q connman &>/dev/null ; then
         _s systemctl enable connman.service
@@ -505,7 +520,7 @@ archer_services() {
 
     # Services: display manager
     if pacman -Q ly &>/dev/null ; then
-        cat <<EOF > /etc/pam.d/ly
+        _e cat <<EOF > /etc/pam.d/ly
 #%PAM-1.0
 auth        include     system-login
 -auth       optional    pam_gnome_keyring.so
@@ -556,6 +571,7 @@ EOF
     fi
 
     if pacman -Q avahi &>/dev/null ; then
+        _s sed -i 's/^#\?\(MulticastDNS=\).\+/\1no/' /etc/systemd/resolved.conf
         _s systemctl enable avahi-daemon.service
     fi
 
