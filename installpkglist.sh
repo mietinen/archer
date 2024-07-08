@@ -13,9 +13,10 @@ if [ ! -r "$1" ]; then
 fi
 
 list="$(grep -oE '^[^(#|[:space:])]*' "$1" | sort -u)"
+new=$(comm -13 <(pacman -Qq | sort -u) <(echo "$list"))
 repo="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u)"
-packages=$(comm -12 <(echo "$repo") <(echo "$list") | tr '\n' ' ')
-aurpackages=$(comm -13 <(echo "$repo") <(echo "$list") | tr '\n' ' ')
+packages=$(comm -12 <(echo "$repo") <(echo "$new") | tr '\n' ' ')
+aurpackages=$(comm -13 <(echo "$repo") <(echo "$new") | tr '\n' ' ')
 
 echo "Packages to install:"
 echo "$packages"
