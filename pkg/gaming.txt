@@ -1,4 +1,5 @@
 # Packages specific for my desktop gaming pc
+# vim: set ft=conf :
 
 lib32-nvidia-utils              # Nvidia 32bit support
 nvidia                          # Nvidia graphics

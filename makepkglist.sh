@@ -11,30 +11,12 @@
 #
 ## Copyright (c) 2022 Aleksander Mietinen
 
-pacs="$(pacman -Qq | sort -u)"
 [ -n "$1" ] && list="$(cat "$@" | grep -oE '^[^(#|[:space:])]*' | sort -u)"
-expl="$(comm -23 <(pacman -Qqe | sort -u) <(echo "$list"))"
 
 echo "# Generated with makepkglist.sh"
 echo "# - https://github.com/mietinen/archer"
 echo
-echo "# Groups:"
-for g in $(pacman -Qqg | awk '{print $1}' | sort -u); do
-    sqg="$(pacman -Sqg "$g" | sort -u)"
-    count="$(echo "$sqg" | wc -l)"
-    matches="$(comm -12 <(echo "$pacs") <(echo "$sqg") | wc -l)"
-    if [ $count -eq $matches ] ; then
-        pacs="$(comm -23 <(echo "$pacs") <(echo "$sqg"))"
-        groups="$groups $g"
-        echo "$list" | grep -q "$g" || printf "%-32s%s\n" "$g" "# Group: $g"
-    fi
-done
-
-gpacs="$(pacman -Sgq $groups | sort -u)"
-
-echo
-echo "# Other packages:"
-for p in $(comm -23 <(echo "$expl") <(echo "$gpacs")); do
+for p in $(comm -23 <(pacman -Qqe | sort -u) <(echo "$list")); do
     desc="$(pacman -Qi "$p" | grep Description | cut -d: -f2)"
     pacman -Qm "$p" >/dev/null 2>&1 && aur=" (AUR)" || aur=""
     printf "%-32s%s\n" "$p" "#$desc$aur"

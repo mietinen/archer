@@ -30,8 +30,6 @@ aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
 # ------------------------------------------------------------------------------
 pkglist=(
     "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pkglist.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/dev.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/desktop.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/p14s.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/gaming.txt"
     # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pentest.txt"
@@ -318,7 +316,7 @@ archer_pacconf() {
     _s sed -i "s/^#\(Color\)/\1/" /etc/pacman.conf
     _s sed -i "s/^#\(ParallelDownloads\)/\1/" /etc/pacman.conf
     _s sed -i "s/^#\?\(MAKEFLAGS.*\)-j[0-9]\+\(.*\)/\1-j$(nproc)\2/" /etc/makepkg.conf
-    # _s sed -i '/^OPTIONS/s/\([ (]\)debug/\1!debug/' /etc/makepkg.conf
+    _s sed -i '/^OPTIONS/s/\([ (]\)debug/\1!debug/' /etc/makepkg.conf
     if [ "$multilib" = true ] ; then
         _s sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
     fi
@@ -524,10 +522,12 @@ archer_services() {
 #%PAM-1.0
 auth        include     system-login
 -auth       optional    pam_gnome_keyring.so
+-auth       optional    pam_kwallet5.so
 account     include     system-login
 password    include     system-login
 session     include     system-login
 -session    optional    pam_gnome_keyring.so auto_start
+-session    optional    pam_kwallet5.so auto_start
 EOF
         _s systemctl enable ly.service
     elif pacman -Q lightdm &>/dev/null ; then

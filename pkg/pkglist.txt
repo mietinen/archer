@@ -1,4 +1,5 @@
 # Basic packages i want on all my systems
+# vim: set ft=conf :
 
 # Basic stuff
 linux                           # The Linux kernel and modules
@@ -20,6 +21,10 @@ zsh-autosuggestions             # Zsh Fish like suggestions
 # Terminal apps
 neovim                          # better VIM editor
 neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
+lynx                            # A text browser for the World Wide Web
+neomutt                         # mutt with added features
+khard                           # Console address book manager
+vdirsyncer                      # Synchronize CalDAV and CardDAV
 zk                              # Zettelkasten or personal wiki
 ripgrep                         # Better, faster grep
 fzf                             # Command-line fuzzy finder
@@ -45,3 +50,128 @@ unzip                           # Zip archive
 unrar                           # Rar archive
 p7zip                           # 7zip archive
 yt-dlp                          # Youtube video downloader
+
+# Hyprland desktop
+hyprland                        # Window manager
+xdg-desktop-portal-gtk          # xdg-desktop-portal using GTK
+xdg-desktop-portal-hyprland     # xdg-desktop-portal backend for hyprland
+waybar                          # Status bar
+hyprpaper                       # hyprland's wallpaper utility
+hyprlock                        # hyprland’s screen locking utility
+hypridle                        # hyprland’s idle daemon
+rofi-wayland                    # rofi fork with wayland support
+polkit-gnome                    # Polkit
+gnome-keyring                   # Password management
+mako                            # Notification daemon for Wayland
+libnotify                       # Desktop notifications
+xorg-xwayland                   # Run X clients under Wayland
+xdg-user-dirs                   # XDG user directories
+wl-clipboard                    # Clipboard
+grim                            # Screenshot utility for Wayland
+slurp                           # Select a region in Wayland
+thunar                          # GTK+ file manager
+xarchiver                       # Thunar file archive support
+pavucontrol                     # PulseAudio GTK Volume Control
+brightnessctl                   # Lightweight brightness control tool
+ly                              # TUI display manager
+
+# Theming
+gtk-engine-murrine              # GTK theme engine
+gnome-themes-extra              # Adwaita GTK theme
+papirus-icon-theme              # Icon theme
+archlinux-wallpaper             # Wallpaper pack
+gruvbox-material-gtk-theme-git  # GTK theme (AUR)
+gruvbox-material-icon-theme-git # Icon theme (AUR)
+qt5gtk2                         # GTK+2.0 integration plugins for Qt5 (AUR)
+qt6gtk2                         # GTK+2.0 integration plugins for Qt6 (AUR)
+
+# Fonts
+adobe-source-code-pro-fonts     # Font pack
+ttf-inconsolata                 # Font pack
+ttf-linux-libertine             # Font pack
+noto-fonts                      # Font pack
+noto-fonts-cjk                  # Font pack
+noto-fonts-emoji                # Font pack
+ttf-nerd-fonts-symbols          # Font pack
+
+# Sound
+pipewire                        # Multimedia framework
+pipewire-pulse                  # PulseAudio replacement
+wireplumber                     # Session / policy manager implementation for PipeWire
+pulsemixer                      # PulseAudio Volume Control
+
+# Network
+wireguard-tools                 # WireGuard tools for configuration
+networkmanager                  # NetworkManager
+nm-connection-editor            # NetworkManager GUI connection editor
+networkmanager-dmenu-git        # NetworkManager menu dmenu/rofi (AUR)
+networkmanager-openvpn          # NetworkManager openvpn support
+ufw                             # Uncomplicated Firewall
+
+# Printers
+avahi                           # Zero-configuration networking
+nss-mdns                        # .local hostname resolution
+cups                            # open source printing system
+
+# Utility
+usbutils                        # lsusb
+dmidecode                       # System information
+fwupd                           # UEFI bios update
+smbclient                       # SMB client
+gvfs-smb                        # Thunar SMB support
+rclone                          # Cloud file sync
+libva-utils                     # Verifying video HW accel
+dos2unix                        # text file format converter
+perl-image-exiftool             # file EXIF informations
+
+# apps
+alacritty                       # Terminal
+qalculate-gtk                   # Calculator
+firefox                         # Web browser
+chromium                        # Web browser
+syncthing                       # File synchronization
+spotify-launcher                # Music streaming
+plex-media-player               # Video streaming desktop client (AUR)
+imv                             # Image viewer
+mpv                             # Video player
+zathura-pdf-poppler             # PDF viewer
+libreoffice-fresh               # LibreOffice
+pinta                           # Editing program modeled after Paint.NET
+gimp                            # GNU Image Manipulation Program
+discord                         # Discord VoIP game chat
+ventoy-bin                      # Multiboot USB drive (AUR)
+newsboat                        # Terminal RSS/Atom feed reader
+
+# Virtual machines
+qemu-desktop                    # Virtualizer/emulator
+virt-manager                    # VM managing GUI
+dnsmasq                         # VM networking
+iptables-nft                    # VM networking
+edk2-ovmf                       # VM UEFI support
+
+# Basic pentesting/networking tools
+nmap                            # portscan (includes ncat)
+wavemon                         # Wifi monitoring
+wireshark-qt                    # network protocol analyzer
+mitmproxy                       # MITM HTTPS proxy
+python-shodan                   # command-line utility for Shodan
+tcpdump                         # network packet analyzer
+bettercap                       # Network Swiss army knife
+
+# Development tools
+android-tools                   # Android platform tools
+bash-language-server            # Bash language server
+shellcheck-bin                  # Check sh/bash scripts (AUR)
+go                              # Go programming language
+gopls                           # Go language server
+rust                            # Rust programming language
+rust-analyzer                   # Rust language server
+pyright                         # Python language server
+lua-language-server             # Lua language server
+stylua                          # Lua code formatter
+prettier                        # HTML/JS/TS/JSON code formatter
+zola                            # Zola static site engine
+lazygit                         # Simple terminal UI for git commands
+jq                              # Command-line JSON processor
+podman                          # Docker alternativ
+podman-compose                  # run docker-compose.yml using podman
