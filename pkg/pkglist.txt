@@ -8,6 +8,7 @@ sudo                            # sudo
 openssh                         # SSH
 bash-completion                 # Bash compilation
 snapper                         # Btrfs snapshots tool
+man-db                          # man pages utility
 man-pages                       # Linux man pages
 archlinux-contrib               # Collection of contrib scripts used in Arch Linux
 pacman-contrib                  # Contributed scripts and tools for pacman systems
@@ -29,7 +30,7 @@ zk                              # Zettelkasten or personal wiki
 ripgrep                         # Better, faster grep
 fzf                             # Command-line fuzzy finder
 bat                             # Cat with syntax highlighting
-mlocate                         # locate/updatedb
+plocate                         # locate/updatedb
 tree                            # tree
 progress                        # Coreutils Progress Viewer
 lf                              # Terminal file manager
@@ -50,6 +51,7 @@ unzip                           # Zip archive
 unrar                           # Rar archive
 p7zip                           # 7zip archive
 yt-dlp                          # Youtube video downloader
+stow                            # For private dotfiles
 
 # Hyprland desktop
 hyprland                        # Window manager
