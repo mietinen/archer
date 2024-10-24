@@ -18,7 +18,7 @@ language="en_GB"        # Language for locale.conf
 locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"         # Size of swap file in MB (auto=MemTotal, 0=no swap)
+swapsize="auto"         # Size of swap file (accepting k/m/g/e/p suffix, auto=MemTotal, 0=no swap)
 snapsub=true            # Create @snap to avoid nested snapshots subvolume
 encrypt=true            # Set up dm-crypt/LUKS on root partition
 multilib=true           # Enable multilib (true/false)
@@ -38,10 +38,7 @@ pkglist=(
 # ------------------------------------------------------------------------------
 # Dotfiles git repo (git bare style)
 # ------------------------------------------------------------------------------
-dotfilesrepo=(
-    "https://github.com/mietinen/dots.git"
-)
-
+dotfilesrepo="https://github.com/mietinen/dots.git"
 
 # ------------------------------------------------------------------------------
 # End of settings
@@ -72,7 +69,7 @@ fi
 # Set size of swap file same as total memory if set as auto
 # ------------------------------------------------------------------------------
 [ "$swapsize" = "auto" ] && \
-    swapsize=$((($(grep MemTotal /proc/meminfo | awk '{print $2}')+500)/1000))
+    swapsize="$(free -b|awk '/^Mem:/{print $2}')"
 
 # ------------------------------------------------------------------------------
 # Run at launch
@@ -120,17 +117,16 @@ archer_partition() {
 # ------------------------------------------------------------------------------
 archer_encrypt() {
     mapper="$rootdev"
-    if [ "$encrypt" = true ] ; then
-        printm 'Setting up encryption'
-        echo
-        _s dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock
-        _e cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -i 256 -c aes-xts-plain64 "$rootdev" .root.keyfile
-        _e cryptsetup -q open "$rootdev" root --key-file .root.keyfile
-        _e cryptsetup -q luksAddKey "$rootdev" -i 256 --key-file .root.keyfile
-        mapper="/dev/mapper/root"
-        printm 'Encryption setup'
-        showresult
-    fi
+    test "$encrypt" != true && return
+    printm 'Setting up encryption'
+    echo
+    _s dd bs=512 count=4 if=/dev/random of=.root.keyfile iflag=fullblock
+    _e cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 256 -i 256 -c aes-xts-plain64 "$rootdev" .root.keyfile
+    _e cryptsetup -q open "$rootdev" root --key-file .root.keyfile
+    _e cryptsetup -q luksAddKey "$rootdev" -i 256 --key-file .root.keyfile
+    mapper="/dev/mapper/root"
+    printm 'Encryption setup'
+    showresult
 }
 
 # ------------------------------------------------------------------------------
@@ -167,7 +163,7 @@ archer_mount() {
     [ "$snapsub" = true ] && \
         _s mount -o $opt,subvol=@snap "$mapper" /mnt/.snapshots
     if [ "$swapsize" != "0" ] ; then
-        _s btrfs filesystem mkswapfile --size "${swapsize}m" --uuid clear /mnt/var/swapfile
+        _s btrfs filesystem mkswapfile --size "${swapsize}" --uuid clear /mnt/var/swapfile
         _s swapon /mnt/var/swapfile
     fi
     if [ -d "/sys/firmware/efi" ] ; then
@@ -359,28 +355,26 @@ archer_bootloader() {
 # Reading packages from pkglist.txt
 # ------------------------------------------------------------------------------
 archer_readpkg() {
-    if [ -r /root/pkglist.txt ] ; then
-        printm 'Reading packages from pkglist.txt'
-        repo="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
-        list="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt | sort -u 2>>err.o)" || err=true
-        packages=$(comm -12 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
-        aurpackages=$(comm -13 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
-        showresult
-    fi
+    test ! -r /root/pkglist.txt && return
+    printm 'Reading packages from pkglist.txt'
+    repo="$(cat <(pacman -Slq) <(pacman -Sgq) | sort -u 2>>err.o)" || err=true
+    list="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt | sort -u 2>>err.o)" || err=true
+    packages=$(comm -12 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
+    aurpackages=$(comm -13 <(echo "$repo") <(echo "$list") | tr '\n' ' ' 2>>err.o) || err=true
+    showresult
 }
 
 # ------------------------------------------------------------------------------
 # Installing extra packages
 # ------------------------------------------------------------------------------
 archer_pacinstall() {
-    if [ -n "$packages" ] ; then
-        printm 'Installing extra packages'
-        # Can be needed if iso is old.
-        _s pacman --noconfirm -Sy archlinux-keyring
-        # --ask 4: ALPM_QUESTION_CONFLICT_PKG = (1 << 2)
-        _s pacman --noconfirm --needed --ask 4 -S $packages
-        showresult
-    fi
+    test -z "$packages" && return
+    printm 'Installing extra packages'
+    # Can be needed if iso is old.
+    _s pacman --noconfirm -Sy archlinux-keyring
+    # --ask 4: ALPM_QUESTION_CONFLICT_PKG = (1 << 2)
+    _s pacman --noconfirm --needed --ask 4 -S $packages
+    showresult
 }
 
 # ------------------------------------------------------------------------------
@@ -407,7 +401,7 @@ EOF
         grep -e "hosts:.*mdns_minimal" /etc/nsswitch.conf &>/dev/null || \
             _s sed -i '/^hosts:/s/\(resolve\|dns\)/mdns_minimal \[NOTFOUND=return\] \1/' /etc/nsswitch.conf
     fi
-    if pacman -Q mlocate &>/dev/null ; then
+    if pacman -Q plocate &>/dev/null ; then
         grep -e "PRUNENAMES.*\.snapshots" /etc/updatedb.conf &>/dev/null || \
             _s sed -i '/^PRUNENAMES/s/"\(.*\)"/"\1 .snapshots"/' /etc/updatedb.conf
     fi
@@ -441,41 +435,36 @@ archer_user() {
 # Installing AUR helper and packages
 # ------------------------------------------------------------------------------
 archer_aurinstall() {
-    if [ -n "$aurhelper" ] ; then
-        # Installing AUR helper
-        printm "Installing AUR helper ($aurhelper)"
-        _s pacman --noconfirm --needed -S base-devel git
-        _s cd /tmp
-        _s sudo -u "$username" git clone "https://aur.archlinux.org/$aurhelper.git"
-        _s cd "$aurhelper"
-        _s sudo -u "$username" makepkg --noconfirm -si
-        showresult
-        if [ -n "$aurpackages" ] ; then
-            printm 'Installing AUR packages (Failures can be checked out manually later)'
-            for aur in $aurpackages; do
-                _s sudo -u "$username" "${aurhelper%-@(bin|git)}" -S --noconfirm "$aur"
-            done
-            showresult
-        fi
-    fi
+    test -z "$aurhelper" && retrun
+    printm "Installing AUR helper ($aurhelper)"
+    _s pacman --noconfirm --needed -S base-devel git
+    _s cd /tmp
+    _s sudo -u "$username" git clone "https://aur.archlinux.org/$aurhelper.git"
+    _s cd "$aurhelper"
+    _s sudo -u "$username" makepkg --noconfirm -si
+    showresult
+
+    test -z "$aurpackages" && retrun
+    printm 'Installing AUR packages (Failures can be checked out manually later)'
+    for aur in $aurpackages; do
+        _s sudo -u "$username" "${aurhelper%-@(bin|git)}" -S --noconfirm "$aur"
+    done
+    showresult
 }
 
 # ------------------------------------------------------------------------------
 # Installing dotfiles from git repo
 # ------------------------------------------------------------------------------
 archer_dotfiles() {
-    if [ ${#dotfilesrepo[@]} -gt 0 ] ; then
-        printm 'Installing dotfiles from git repo'
-        _s pacman --noconfirm --needed -S git
-        for repo in "${dotfilesrepo[@]}" ; do
-            tempdir="$(mktemp -d)" || err=true
-            _s chown -R "$username:$username" "$tempdir"
-            _s sudo -u "$username" git clone --depth 1 "$repo" "$tempdir/dotfiles"
-            _s rm -rf "$tempdir/dotfiles/.git"
-            _s sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username"
-        done
-        showresult
-    fi
+    test -z "$dotfilesrepo" && retrun
+    printm 'Installing dotfiles from git repo'
+    _s pacman --noconfirm --needed -S git
+    tempdir="$(mktemp -d)" || err=true
+    _s chown -R "$username:$username" "$tempdir"
+    _s sudo -u "$username" git clone --depth 1 "$dotfilesrepo" "$tempdir/dotfiles"
+    _s rm -rf "$tempdir/dotfiles/.git"
+    _s sudo -u "$username" cp -rfT "$tempdir/dotfiles" "/home/$username"
+    showresult
 }
 
 # ------------------------------------------------------------------------------
