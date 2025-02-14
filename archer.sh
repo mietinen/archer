@@ -3,7 +3,7 @@
 # Archer Archlinux install script
 # Setup with EFI/MBR bootloader (GRUB) at 200M /boot/efi partition
 #               * btrfs root partition
-#                 * @root, @home, @srv, @var, @snap subvolumes
+#                 * @root, @home, @srv, @var_log, @snap, @swap subvolumes
 #                 * Auto/manual/none swap file
 #
 ## Copyright (c) 2022 Aleksander Mietinen
@@ -18,7 +18,7 @@ language="en_GB"        # Language for locale.conf
 locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
-swapsize="auto"         # Size of swap file (accepting k/m/g/e/p suffix, auto=MemTotal, 0=no swap)
+swapsize="0"            # Size of swap file (accepting k/m/g/e/p suffix, auto=MemTotal, 0=no swap)
 snapsub=true            # Create @snap to avoid nested snapshots subvolume
 encrypt=true            # Set up dm-crypt/LUKS on root partition
 multilib=true           # Enable multilib (true/false)
@@ -143,8 +143,9 @@ archer_format() {
     _s btrfs subvolume create /mnt/@root
     _s btrfs subvolume create /mnt/@home
     _s btrfs subvolume create /mnt/@srv
-    _s btrfs subvolume create /mnt/@var
+    _s btrfs subvolume create /mnt/@var_log
     [ "$snapsub" = true ] && _s btrfs subvolume create /mnt/@snap
+    [ "$swapsize" -ne 0 ] && _s btrfs subvolume create /mnt/@swap
     _s umount /mnt
     showresult
 }
@@ -156,15 +157,19 @@ archer_mount() {
     printm 'Mounting partitions'
     opt="compress=zstd"
     _s mount -o $opt,subvol=@root "$mapper" /mnt
-    _s mkdir -p /mnt/{home,srv,var,.snapshots}
+    _s mkdir -p /mnt/{home,srv,var/log}
     _s mount -o $opt,subvol=@home "$mapper" /mnt/home
     _s mount -o $opt,subvol=@srv "$mapper" /mnt/srv
-    _s mount -o nodatacow,subvol=@var "$mapper" /mnt/var
-    [ "$snapsub" = true ] && \
+    _s mount -o $opt,subvol=@var_log "$mapper" /mnt/var/log
+    if [ "$snapsub" = true ]; then
+        _s mkdir -p /mnt/.snapshots
         _s mount -o $opt,subvol=@snap "$mapper" /mnt/.snapshots
-    if [ "$swapsize" != "0" ] ; then
-        _s btrfs filesystem mkswapfile --size "${swapsize}" --uuid clear /mnt/var/swapfile
-        _s swapon /mnt/var/swapfile
+    fi
+    if [ "$swapsize" -ne 0 ] ; then
+        _s mkdir -p /mnt/.swap
+        _s mount -o $opt,subvol=@swap "$mapper" /mnt/.swap
+        _s btrfs filesystem mkswapfile --size "${swapsize}" --uuid clear /mnt/.swap/swapfile
+        _s swapon /mnt/.swap/swapfile
     fi
     if [ -d "/sys/firmware/efi" ] ; then
         _s mkdir -p /mnt/boot/efi
@@ -211,7 +216,7 @@ archer_pkgfetch() {
 archer_pacstrap() {
     printm 'Installing base to disk'
     [ -r /mnt/root/pkglist.txt ] && \
-        kernel="$(_e grep -oE '^[^(#|[:space:])]*' /mnt/root/pkglist.txt | grep -E '^linux(-hardened|-lts|-zen)?$' | tr '\n' ' ')"
+        kernel="$(_e grep -oE '^[^(#|[:space:])]*' /mnt/root/pkglist.txt | grep -E '^linux(-hardened|-lts|-zen|-rt|-rt-lts)?$' | tr '\n' ' ')"
     _s pacstrap /mnt base ${kernel:-linux} linux-firmware btrfs-progs sudo
     _e genfstab -U /mnt >> /mnt/etc/fstab
     showresult
@@ -316,10 +321,6 @@ archer_pacconf() {
     if [ "$multilib" = true ] ; then
         _s sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
     fi
-    # Move DBpath out of /var, to make it a part of @root snapshots
-    _s mv /var/lib/pacman/ /usr/lib/pacman/
-    _s ln -sf ../../usr/lib/pacman/ /var/lib/pacman
-    _s sed -i 's/^#\?\(DBPath\s\+=\).\+/\1 \/usr\/lib\/pacman\//' /etc/pacman.conf
     showresult
 }
 
@@ -340,6 +341,10 @@ archer_bootloader() {
     else
         _s grub-install --target=i386-pc --recheck "$device"
     fi
+
+    top_kernel="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt 2>/dev/null | grep -E '^linux(-hardened|-lts|-zen|-rt|-rt-lts)?$' | head -n 1)"
+    test -n "$top_kernel" && \
+        _e printf '\nGRUB_TOP_LEVEL="/boot/vmlinuz-%s"\n' "$top_kernel" >> /etc/default/grub
 
     vendor="$(awk '/^vendor_id/ {print $NF;exit}' /proc/cpuinfo)"
     case "${vendor,,}" in
@@ -538,6 +543,13 @@ EOF
         _s systemctl enable entrance.service
     fi
 
+    # Services: cpu scaling
+    if pacman -Q tuned &>/dev/null ; then
+        _s systemctl enable tuned.service
+    elif pacman -Q auto-cpufreq &>/dev/null ; then
+        _s systemctl enable auto-cpufreq.service
+    fi
+
     # Services: other
     if pacman -Q util-linux &>/dev/null ; then
         _s systemctl enable fstrim.timer
@@ -570,10 +582,6 @@ EOF
 
     if pacman -Q autorandr &>/dev/null ; then
         _s systemctl enable autorandr.service
-    fi
-
-    if pacman -Q auto-cpufreq &>/dev/null ; then
-        _s systemctl enable auto-cpufreq.service
     fi
     showresult
 }

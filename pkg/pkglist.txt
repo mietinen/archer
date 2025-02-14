@@ -3,6 +3,7 @@
 
 # Basic stuff
 linux                           # The Linux kernel and modules
+linux-lts                       # Fallback Linux kernel and modules
 base-devel                      # Building tools
 sudo                            # sudo
 openssh                         # SSH
@@ -43,7 +44,7 @@ htop                            # Interactive process viewer
 bottom                          # A graphical process/system monitor
 pv                              # Pipe viewer
 whois                           # Domain lookup
-neofetch                        # Terminal splash
+macchina                        # Terminal splash
 expac                           # pacman database extraction utility
 reflector                       # Pacman mirror update
 rsync                           # Rsync

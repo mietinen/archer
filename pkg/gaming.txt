@@ -8,3 +8,5 @@ nvtop                           # Nvidia process viewer
 opencl-nvidia                   # Nvidia OpenCL
 os-prober                       # Windows detect for dual boot
 steam                           # Valve software delivery system
+retroarch                       # Reference frontend for the libretro API
+retroarch-assets-ozone          # XMB menu assets for RetroArch

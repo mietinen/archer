@@ -3,11 +3,10 @@
 
 xf86-video-amdgpu               # AMD graphics
 vulkan-radeon                   # AMD graphics
-libva-mesa-driver               # Open-source VA-API drivers
-mesa-vdpau                      # Open-source VDPAU drivers
+mesa                            # Open-source OpenGL drivers
 bluez-utils                     # Bluetooth
 blueman                         # GTK+ bluetooth manager
 upower                          # Battery status (bluetooth)
-auto-cpufreq                    # Longer battert life
+tuned                           # Longer battert life
 modemmanager                    # 4G/LTE modem manager
 # acpi_call                     # 4G/LTE modem hack
