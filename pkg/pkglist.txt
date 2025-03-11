@@ -23,8 +23,8 @@ zsh-autosuggestions             # Zsh Fish like suggestions
 # Terminal apps
 neovim                          # better VIM editor
 neovim-symlinks                 # Runs neovim if vi or vim is called (AUR)
-lynx                            # A text browser for the World Wide Web
-neomutt                         # mutt with added features
+w3m                             # Text-based Web browser
+aerc                            # Email Client for your Terminal
 khard                           # Console address book manager
 vdirsyncer                      # Synchronize CalDAV and CardDAV
 zk                              # Zettelkasten or personal wiki
