@@ -7,6 +7,6 @@ mesa                            # Open-source OpenGL drivers
 bluez-utils                     # Bluetooth
 blueman                         # GTK+ bluetooth manager
 upower                          # Battery status (bluetooth)
-tuned                           # Longer battert life
+tuned                           # Longer battery life
 modemmanager                    # 4G/LTE modem manager
 # acpi_call                     # 4G/LTE modem hack

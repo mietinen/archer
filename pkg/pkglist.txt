@@ -44,6 +44,7 @@ htop                            # Interactive process viewer
 bottom                          # A graphical process/system monitor
 pv                              # Pipe viewer
 whois                           # Domain lookup
+ldns                            # Fast DNS library supporting recent RFCs
 macchina                        # Terminal splash
 expac                           # pacman database extraction utility
 reflector                       # Pacman mirror update
@@ -52,7 +53,6 @@ unzip                           # Zip archive
 unrar                           # Rar archive
 p7zip                           # 7zip archive
 yt-dlp                          # Youtube video downloader
-stow                            # For private dotfiles
 
 # Hyprland desktop
 hyprland                        # Window manager
@@ -62,7 +62,7 @@ waybar                          # Status bar
 hyprpaper                       # hyprland's wallpaper utility
 hyprlock                        # hyprland’s screen locking utility
 hypridle                        # hyprland’s idle daemon
-rofi-wayland                    # rofi fork with wayland support
+rofi                            # A window switcher, application launcher and dmenu replacement
 polkit-gnome                    # Polkit
 gnome-keyring                   # Password management
 mako                            # Notification daemon for Wayland
@@ -70,6 +70,7 @@ libnotify                       # Desktop notifications
 xorg-xwayland                   # Run X clients under Wayland
 xdg-user-dirs                   # XDG user directories
 wl-clipboard                    # Clipboard
+wtype                           # xdotool type for wayland
 grim                            # Screenshot utility for Wayland
 slurp                           # Select a region in Wayland
 thunar                          # GTK+ file manager
@@ -107,9 +108,10 @@ pulsemixer                      # PulseAudio Volume Control
 wireguard-tools                 # WireGuard tools for configuration
 networkmanager                  # NetworkManager
 nm-connection-editor            # NetworkManager GUI connection editor
-networkmanager-dmenu-git        # NetworkManager menu dmenu/rofi (AUR)
+networkmanager-dmenu            # NetworkManager menu dmenu/rofi
 networkmanager-openvpn          # NetworkManager openvpn support
 ufw                             # Uncomplicated Firewall
+openresolv                      # resolv.conf management
 
 # Printers
 avahi                           # Zero-configuration networking
@@ -137,6 +139,8 @@ spotify-launcher                # Music streaming
 plex-media-player               # Video streaming desktop client (AUR)
 imv                             # Image viewer
 mpv                             # Video player
+mpd                             # Music Player Daemon
+rmpc                            # TUI client for MPD
 zathura-pdf-poppler             # PDF viewer
 libreoffice-fresh               # LibreOffice
 pinta                           # Editing program modeled after Paint.NET

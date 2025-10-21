@@ -17,7 +17,7 @@ device="/dev/nvme0n1"   # Drive for install (/dev/nvme0n1, /dev/sda, etc)
 language="en_GB"        # Language for locale.conf
 locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
-timezone="Europe/Oslo"  # Timezone (located in /usr/share/zoneinfo/../..)
+timezone="Europe/Oslo"  # Timezone (timedatectl list-timezones)
 swapsize="0"            # Size of swap file (accepting k/m/g/e/p suffix, auto=MemTotal, 0=no swap)
 snapsub=true            # Create @snap to avoid nested snapshots subvolume
 encrypt=true            # Set up dm-crypt/LUKS on root partition
@@ -275,7 +275,7 @@ archer_locale() {
 # ------------------------------------------------------------------------------
 archer_timezone() {
     printm 'Setting timezone and adjtime'
-    _s ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime
+    _s timedatectl set-timezone "$timezone"
     _s hwclock --systohc
     showresult
 }
@@ -286,9 +286,7 @@ archer_timezone() {
 archer_hostname() {
     printm 'Setting hostname'
     _e printf "%s\n" "$hostname" > /etc/hostname
-    _e printf "%-15s %s\n" "127.0.0.1" "localhost" > /etc/hosts
-    _e printf "%-15s %-15s %-15s %-15s\n" "::1" "localhost" "ip6-localhost" "ip6-loopback" >> /etc/hosts
-    _e printf "%-15s %-15s %-15s %-15s\n" "127.0.1.1" "$hostname" "${hostname}.home.arpa" >> /etc/hosts
+    _e printf "%-16s %s %s\n" "127.0.1.1" "$hostname" "${hostname}.home.arpa" >> /etc/hosts
     showresult
 }
 
@@ -512,18 +510,8 @@ archer_services() {
 
     # Services: display manager
     if pacman -Q ly &>/dev/null ; then
-        _e cat <<EOF > /etc/pam.d/ly
-#%PAM-1.0
-auth        include     system-login
--auth       optional    pam_gnome_keyring.so
--auth       optional    pam_kwallet5.so
-account     include     system-login
-password    include     system-login
-session     include     system-login
--session    optional    pam_gnome_keyring.so auto_start
--session    optional    pam_kwallet5.so auto_start
-EOF
         _s systemctl enable ly.service
+
     elif pacman -Q lightdm &>/dev/null ; then
         _s systemctl enable lightdm.service
 
