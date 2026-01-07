@@ -22,7 +22,7 @@ swapsize="0"            # Size of swap file (accepting k/m/g/e/p suffix, auto=Me
 snapsub=true            # Create @snap to avoid nested snapshots subvolume
 encrypt=true            # Set up dm-crypt/LUKS on root partition
 multilib=true           # Enable multilib (true/false)
-aurhelper="paru-bin"    # Install AUR helper (yay,paru.. blank for none)
+aurhelper="yay"         # Install AUR helper (yay,paru.. blank for none)
                         # Also installs: base-devel git
 
 # ------------------------------------------------------------------------------
@@ -297,8 +297,7 @@ archer_initramfs() {
     printm 'Creating new initramfs'
     _s sed -i '/^MODULES=/s/=()/=(btrfs)/' /etc/mkinitcpio.conf
     if [ "$encrypt" = true ] ; then
-        _s sed -i '/^HOOKS=/s/\(filesystems\)/encrypt \1/' /etc/mkinitcpio.conf
-        _s sed -i '/^HOOKS=/s/\(autodetect\)/keyboard keymap \1/' /etc/mkinitcpio.conf
+        _s sed -i '/^HOOKS=/s/\(filesystems\)/sd-encrypt \1/' /etc/mkinitcpio.conf
         _s sed -i ':s;/^HOOKS=/s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;/^HOOKS=/s/  */ /g' /etc/mkinitcpio.conf
         _s sed -i '/^FILES=/s/=()/=(\/boot\/.root.keyfile)/' /etc/mkinitcpio.conf
     fi
@@ -330,14 +329,16 @@ archer_bootloader() {
     _s pacman --noconfirm --needed -Sy grub grub-btrfs inotify-tools
     if [ "$encrypt" = true ] ; then
         rootid=$(blkid --output export "$rootdev" | sed --silent 's/^UUID=//p')
-        _s sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="cryptdevice=UUID='"$rootid"':root:allow-discards cryptkey=rootfs:\/boot\/.root.keyfile"/' /etc/default/grub
+        _s sed -i '/^GRUB_CMDLINE_LINUX=/s/=""/="rd.luks.name='"$rootid"'=root rd.luks.key='"$rootid"'=\/boot\/.root.keyfile"/' /etc/default/grub
         _s sed -i 's/^#\?\(GRUB_ENABLE_CRYPTODISK=\).\+/\1y/' /etc/default/grub
     fi
     if [ -d "/sys/firmware/efi" ] ; then
         _s pacman --noconfirm --needed -S efibootmgr
-        _s grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck "$device"
+        _s grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+        grub_install="--target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB"
     else
-        _s grub-install --target=i386-pc --recheck "$device"
+        _s grub-install --target=i386-pc
+        grub_install="--target=i386-pc"
     fi
 
     top_kernel="$(grep -oE '^[^(#|[:space:])]*' /root/pkglist.txt 2>/dev/null | grep -E '^linux(-hardened|-lts|-zen|-rt|-rt-lts)?$' | head -n 1)"
@@ -351,6 +352,20 @@ archer_bootloader() {
     esac
 
     _s grub-mkconfig -o /boot/grub/grub.cfg
+    mkdir -p /etc/pacman.d/hooks/
+    _e cat <<EOF >/etc/pacman.d/hooks/grub-update.hook
+[Trigger]
+Operation = Upgrade
+
+Type = Package
+Target = grub
+
+[Action]
+Description = Regenerate grub if updated
+When = PostTransaction
+Depends = grub
+Exec = /bin/sh -c "/usr/bin/grub-install $grub_install && /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg"
+EOF
     showresult
 }
 
@@ -510,7 +525,7 @@ archer_services() {
 
     # Services: display manager
     if pacman -Q ly &>/dev/null ; then
-        _s systemctl enable ly.service
+        _s systemctl enable ly@tty7.service
 
     elif pacman -Q lightdm &>/dev/null ; then
         _s systemctl enable lightdm.service
@@ -549,6 +564,10 @@ archer_services() {
 
     if pacman -Q modemmanager &>/dev/null ; then
         _s systemctl enable ModemManager.service
+    fi
+
+    if pacman -Q firewalld &>/dev/null ; then
+        _s systemctl enable firewalld.service
     fi
 
     if pacman -Q ufw &>/dev/null ; then
