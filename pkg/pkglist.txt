@@ -110,8 +110,8 @@ networkmanager                  # NetworkManager
 nm-connection-editor            # NetworkManager GUI connection editor
 networkmanager-dmenu            # NetworkManager menu dmenu/rofi
 networkmanager-openvpn          # NetworkManager openvpn support
-ufw                             # Uncomplicated Firewall
-openresolv                      # resolv.conf management
+firewalld                       # Firewall daemon
+systemd-resolvconf              # systemd resolvconf replacement
 
 # Printers
 avahi                           # Zero-configuration networking
