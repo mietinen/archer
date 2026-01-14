@@ -29,16 +29,16 @@ aurhelper="yay"         # Install AUR helper (yay,paru.. blank for none)
 # pkglist.txt for extra packages (none will use pkglist.txt from local directory)
 # ------------------------------------------------------------------------------
 pkglist=(
-    "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pkglist.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/p14s.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/gaming.txt"
-    # "https://raw.githubusercontent.com/mietinen/archer/main/pkg/pentest.txt"
+    "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/pkglist.txt"
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/p14s.txt"
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/gaming.txt"
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/pentest.txt"
 )
 
 # ------------------------------------------------------------------------------
 # Dotfiles git repo (git bare style)
 # ------------------------------------------------------------------------------
-dotfilesrepo="https://github.com/mietinen/dots.git"
+dotfilesrepo="https://codeberg.org/mietinen/dots.git"
 
 # ------------------------------------------------------------------------------
 # End of settings
