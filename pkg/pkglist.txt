@@ -38,13 +38,9 @@ lf                              # Terminal file manager
 trash-cli                       # Trash cli, for nnn
 weechat                         # IRC client
 tmux                            # Terminal multiplexer
-iperf3                          # Network speed test
-ookla-speedtest-bin             # Speedtest.net CLI client (AUR)
 htop                            # Interactive process viewer
 bottom                          # A graphical process/system monitor
 pv                              # Pipe viewer
-whois                           # Domain lookup
-ldns                            # Fast DNS library supporting recent RFCs
 macchina                        # Terminal splash
 expac                           # pacman database extraction utility
 reflector                       # Pacman mirror update
@@ -149,15 +145,12 @@ discord                         # Discord VoIP game chat
 ventoy-bin                      # Multiboot USB drive (AUR)
 newsboat                        # Terminal RSS/Atom feed reader
 
-# Virtual machines
-qemu-desktop                    # Virtualizer/emulator
-virt-manager                    # VM managing GUI
-dnsmasq                         # VM networking
-iptables-nft                    # VM networking
-edk2-ovmf                       # VM UEFI support
-
-# Basic pentesting/networking tools
+# Network discovery/monitoring tools
 nmap                            # portscan (includes ncat)
+ldns                            # Fast DNS library supporting recent RFCs
+whois                           # Domain lookup
+iperf3                          # Network speed test
+ookla-speedtest-bin             # Speedtest.net CLI client (AUR)
 wavemon                         # Wifi monitoring
 wireshark-qt                    # network protocol analyzer
 mitmproxy                       # MITM HTTPS proxy
@@ -182,3 +175,10 @@ lazygit                         # Simple terminal UI for git commands
 jq                              # Command-line JSON processor
 podman                          # Docker alternativ
 podman-compose                  # run docker-compose.yml using podman
+
+# Virtual machines
+qemu-desktop                    # Virtualizer/emulator
+virt-manager                    # VM managing GUI
+dnsmasq                         # VM networking
+iptables-nft                    # VM networking
+edk2-ovmf                       # VM UEFI support
