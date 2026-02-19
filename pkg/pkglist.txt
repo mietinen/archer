@@ -41,7 +41,7 @@ tmux                            # Terminal multiplexer
 htop                            # Interactive process viewer
 bottom                          # A graphical process/system monitor
 pv                              # Pipe viewer
-macchina                        # Terminal splash
+fastfetch                       # Terminal splash
 expac                           # pacman database extraction utility
 reflector                       # Pacman mirror update
 rsync                           # Rsync
@@ -82,8 +82,6 @@ papirus-icon-theme              # Icon theme
 archlinux-wallpaper             # Wallpaper pack
 gruvbox-material-gtk-theme-git  # GTK theme (AUR)
 gruvbox-material-icon-theme-git # Icon theme (AUR)
-qt5gtk2                         # GTK+2.0 integration plugins for Qt5 (AUR)
-qt6gtk2                         # GTK+2.0 integration plugins for Qt6 (AUR)
 
 # Fonts
 adobe-source-code-pro-fonts     # Font pack
@@ -132,7 +130,6 @@ firefox                         # Web browser
 chromium                        # Web browser
 syncthing                       # File synchronization
 spotify-launcher                # Music streaming
-plex-media-player               # Video streaming desktop client (AUR)
 imv                             # Image viewer
 mpv                             # Video player
 mpd                             # Music Player Daemon
