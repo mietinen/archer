@@ -14,8 +14,8 @@
 hostname="archer"       # Machine hostname
 username="mietinen"     # Main user
 device="/dev/nvme0n1"   # Drive for install (/dev/nvme0n1, /dev/sda, etc)
-language="en_GB"        # Language for locale.conf
-locale="nb_NO"          # Numbers, messurement, etc. for locale.conf
+language="en_DK"        # Language for locale.conf
+formats="nb_NO"         # Numbers, messurement, etc. for locale.conf
 keymap="no"             # Keymap (localectl list-keymaps)
 timezone="Europe/Oslo"  # Timezone (timedatectl list-timezones)
 swapsize="0"            # Size of swap file (accepting k/m/g/e/p suffix, auto=MemTotal, 0=no swap)
@@ -249,24 +249,20 @@ archer_chroot() {
 # ------------------------------------------------------------------------------
 archer_locale() {
     printm 'Setting up locale and keyboard'
-    _s sed -i '/^#'$locale'/s/^#//g' /etc/locale.gen
     _s sed -i '/^#'$language'/s/^#//g' /etc/locale.gen
+    _s sed -i '/^#'$formats'/s/^#//g' /etc/locale.gen
     _s sed -i '/^#en_US/s/^#//g' /etc/locale.gen
     _s locale-gen
     _e printf "KEYMAP=%s\n" "$keymap" > /etc/vconsole.conf
     _e printf "LANG=%s.UTF-8\n" "$language" > /etc/locale.conf
-    _e printf "LC_COLLATE=C\n" >> /etc/locale.conf
-    _e printf "LC_ADDRESS=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_CTYPE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_IDENTIFICATION=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    _e printf "LC_MEASUREMENT=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_MESSAGES=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    _e printf "LC_MONETARY=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_NAME=%s.UTF-8\n" "$language" >> /etc/locale.conf
-    _e printf "LC_NUMERIC=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_PAPER=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_TELEPHONE=%s.UTF-8\n" "$locale" >> /etc/locale.conf
-    _e printf "LC_TIME=%s.UTF-8\n" "$language" >> /etc/locale.conf
+    _e printf "LC_COLLATE=C\n\n" >> /etc/locale.conf
+    _e printf "LC_ADDRESS=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_CTYPE=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_MEASUREMENT=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_MONETARY=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_NUMERIC=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_PAPER=%s.UTF-8\n" "$formats" >> /etc/locale.conf
+    _e printf "LC_TELEPHONE=%s.UTF-8\n" "$formats" >> /etc/locale.conf
     showresult
 }
 
