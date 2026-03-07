@@ -14,10 +14,12 @@
 [ -n "$1" ] && list="$(cat "$@" | grep -oE '^[^(#|[:space:])]*' | sort -u)"
 
 echo "# Generated with makepkglist.sh"
-echo "# - https://github.com/mietinen/archer"
+echo "# - https://codeberg.org/mietinen/archer"
 echo
 for p in $(comm -23 <(pacman -Qqe | sort -u) <(echo "$list")); do
     desc="$(pacman -Qi "$p" | grep Description | cut -d: -f2)"
-    pacman -Qm "$p" >/dev/null 2>&1 && aur=" (AUR)" || aur=""
-    printf "%-32s%s\n" "$p" "#$desc$aur"
+    repo=""
+    pacman -Qm "$p" >/dev/null 2>&1 && repo=" (AUR)"
+    pacman -Slq multilib | grep "^$p\$" >/dev/null 2>&1 && repo=" (MULTILIB)"
+    printf "%-32s%s\n" "$p" "#$desc$repo"
 done

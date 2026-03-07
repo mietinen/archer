@@ -179,3 +179,9 @@ virt-manager                    # VM managing GUI
 dnsmasq                         # VM networking
 iptables-nft                    # VM networking
 edk2-ovmf                       # VM UEFI support
+
+# Gaming
+steam                           # Valve software delivery system (MULTILIB)
+gamescope                       # SteamOS session compositing window manager
+retroarch                       # Reference frontend for the libretro API
+retroarch-assets-ozone          # XMB menu assets for RetroArch

@@ -3,10 +3,10 @@
 
 xf86-video-amdgpu               # AMD graphics
 vulkan-radeon                   # AMD graphics
+lib32-vulkan-radeon             # AMD 32bit support (MULTILIB)
 mesa                            # Open-source OpenGL drivers
 bluez-utils                     # Bluetooth
 blueman                         # GTK+ bluetooth manager
 upower                          # Battery status (bluetooth)
 tuned                           # Longer battery life
 modemmanager                    # 4G/LTE modem manager
-# acpi_call                     # 4G/LTE modem hack
