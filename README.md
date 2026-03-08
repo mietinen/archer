@@ -14,7 +14,7 @@ Archer Archlinux install script with EFI/MBR bootloader (GRUB)
 
 Or simply just download, edit some settings and run:
 ```sh
-curl -L https://git.io/JkPC9 -o archer.sh
+curl -LO mietinen.net/archer.sh
 vim archer.sh
 bash archer.sh
 ```

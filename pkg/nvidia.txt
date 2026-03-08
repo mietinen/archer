@@ -1,0 +1,8 @@
+# Nvidia GPU drivers
+# vim: set ft=conf :
+
+nvidia-open                     # Nvidia graphics
+nvidia-utils                    # NVIDIA drivers utilities
+lib32-nvidia-utils              # Nvidia 32bit drivers utilities (MULTILIB)
+cuda                            # NVIDIA's GPU programming toolkit
+opencl-nvidia                   # Nvidia OpenCL

@@ -1,10 +1,6 @@
-# Packages specific for my P14s
+# Laptop utils: Power management, bluetooth, WWAN
 # vim: set ft=conf :
 
-xf86-video-amdgpu               # AMD graphics
-vulkan-radeon                   # AMD graphics
-lib32-vulkan-radeon             # AMD 32bit support (MULTILIB)
-mesa                            # Open-source OpenGL drivers
 bluez-utils                     # Bluetooth
 blueman                         # GTK+ bluetooth manager
 upower                          # Battery status (bluetooth)

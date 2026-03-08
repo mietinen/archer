@@ -1,0 +1,7 @@
+# AMD GPU drivers
+# vim: set ft=conf :
+
+xf86-video-amdgpu               # AMD graphics
+vulkan-radeon                   # AMD Vulkan driver
+lib32-vulkan-radeon             # AMD 32bit Vulkan driver (MULTILIB)
+mesa                            # Open-source OpenGL drivers

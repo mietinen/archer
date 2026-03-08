@@ -1,9 +1,12 @@
-# Packages specific for my desktop gaming pc
+# Gaming packages: Steam, Retroarch
 # vim: set ft=conf :
 
-nvidia                          # Nvidia graphics
-lib32-nvidia-utils              # Nvidia 32bit support (MULTILIB)
-cuda                            # NVIDIA's GPU programming toolkit
-nvtop                           # Nvidia process viewer
-opencl-nvidia                   # Nvidia OpenCL
-os-prober                       # Windows detect for dual boot
+steam                           # Valve software delivery system (MULTILIB)
+gamescope                       # SteamOS session compositing window manager
+retroarch                       # Reference frontend for the libretro API
+retroarch-assets-ozone          # XMB menu assets for RetroArch
+libretro-mesen                  # Libretro: NES Core
+libretro-bsnes                  # Libretro: SNES Core
+libretro-mupen64plus-next       # Libretro: N64 Core
+libretro-beetle-psx-hw          # Libretro: PS1 Core
+libretro-play                   # Libretro: PS2 Core
