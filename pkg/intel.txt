@@ -1,0 +1,8 @@
+# Intel GPU drivers
+# vim: set ft=conf :
+
+xf86-video-intel                # Intel graphics
+vulkan-intel                    # Intel Vulkan driver
+lib32-vulkan-intel              # Intel 32bit Vulkan driver (MULTILIB)
+intel-media-driver              # Intel graphics
+mesa                            # Open-source OpenGL drivers

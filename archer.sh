@@ -30,9 +30,11 @@ aurhelper="yay"         # Install AUR helper (yay,paru.. blank for none)
 # ------------------------------------------------------------------------------
 pkglist=(
     "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/pkglist.txt"
-    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/p14s.txt"
-    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/gaming.txt"
-    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/pentest.txt"
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/amd.txt"    # AMD GPU
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/intel.txt"  # Intel GPU
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/nvidia.txt" # Nvidia GPU
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/laptop.txt" # Laptop utils
+    # "https://codeberg.org/mietinen/archer/raw/branch/main/pkg/gaming.txt" # Gaming packages
 )
 
 # ------------------------------------------------------------------------------
